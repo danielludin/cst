@@ -6,8 +6,8 @@ import java.util.Date;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -47,11 +47,12 @@ public class DateRangeComposite extends CstComposite {
     public DateRangeComposite(Composite parent, int style) {
 	super(parent, style);
 
-	WHITE = new Color(null, 255, 255, 255);
-	COLOR_RED = new Color(null, 255, 20, 20);
-	BLACK = new Color(null, 255, 255, 255);
+
+	InitDatesMouseAdapter initMouseAdapter = new InitDatesMouseAdapter();
 
 	lblCol1 = new Label(this, SWT.NONE);
+	lblCol1.addMouseListener(initMouseAdapter);
+
 	lblCol1.setSize(300, 20);
 	lblCol1.setText(Messages.Cst_Text_erste_Periode);
 
@@ -66,6 +67,7 @@ public class DateRangeComposite extends CstComposite {
 	lblCol2 = new Label(this, SWT.NONE);
 	lblCol2.setSize(300, 20);
 	lblCol2.setText(Messages.Cst_Text_zweite_Periode);
+	lblCol2.addMouseListener(initMouseAdapter);
 
 	cdtPeriod2Start = new CDateTime(this, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM | CDT.TEXT_TRAIL);
 
@@ -78,6 +80,7 @@ public class DateRangeComposite extends CstComposite {
 	lblCol3 = new Label(this, SWT.NONE);
 	lblCol3.setSize(300, 20);
 	lblCol3.setText(Messages.Cst_Text_dritte_Periode);
+	lblCol3.addMouseListener(initMouseAdapter);
 
 	cdtPeriod3Start = new CDateTime(this, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM | CDT.TEXT_TRAIL);
 
@@ -252,14 +255,15 @@ public class DateRangeComposite extends CstComposite {
 	    }
 	});
 
-	addDisposeListener(new DisposeListener() {
-
-	    public void widgetDisposed(DisposeEvent e) {
-		DateRangeComposite.this.widgetDisposed(e);
-	    }
-	});
-
 	setLayout(new PictureLabelLayout());
+
+    }
+
+    class InitDatesMouseAdapter extends MouseAdapter {
+	@Override
+	public void mouseDown(MouseEvent e) {
+	    initDateWidgets();
+	}
 
     }
 
@@ -311,17 +315,6 @@ public class DateRangeComposite extends CstComposite {
 	cal.add(Calendar.DATE, -365);
 	cdtPeriod3Start.setSelection(cal.getTime());
     }
-
-    void widgetDisposed(DisposeEvent e) {
-	WHITE.dispose();
-	BLACK.dispose();
-	COLOR_RED.dispose();
-    }
-
-    /*
-    private void showMessage(String message) {
-    MessageDialog.openInformation(this.getShell(), "CST View", message);
-    }*/
 
     public void setDateStartPeriod1(Date date) {
 	this.cdtPeriod1Start.setSelection(date);
@@ -383,7 +376,7 @@ class PictureLabelLayout extends Layout {
     Point iExtent, tExtent, extentLabel1, extentSlider1, extentText1; // the cached sizes
 
     protected Point computeSize(Composite composite, int wHint, int hHint, boolean changed) {
-	return new Point(500, 300);
+	return new Point(500, 150);
     }
 
     protected void layout(Composite composite, boolean changed) {

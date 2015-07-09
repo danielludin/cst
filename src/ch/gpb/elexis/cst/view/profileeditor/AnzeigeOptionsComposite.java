@@ -161,22 +161,6 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	gdBtnPlausiCheck.horizontalSpan = 2;
 	btnPlausiCheck.setVisible(false);
 	lblPlausiCheck.setVisible(false);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
-	new Label(this, SWT.NONE);
 
 	dateRangeComposite = new DateRangeComposite(anzeigeCanvas, SWT.NONE);
 	GridData gdDateRange = new GridData();

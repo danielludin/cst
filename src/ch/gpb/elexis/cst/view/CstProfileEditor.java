@@ -512,6 +512,15 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			selProfile.setMap(CstGroup.ITEMRANKING, ranking);
 		    }
 
+		    /*
+		    Set keys = itemRanking.keySet();
+		    List lKeys = Arrays.asList(keys.toArray());
+		    Collections.sort(lKeys);
+		    System.out.println("ItemRanking for profile: " + selProfile.getName());
+		    for (Object obj : lKeys) {
+		    System.out.println("Itemranking: " + obj.toString() + " / " + itemRanking.get(obj));
+		    }*/
+
 		    loadCstProfile(selProfile);
 		    tableViewerCstGroups.refresh();
 		}
@@ -624,7 +633,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	if (selProfile.getCstGroups().size() == 0) {
 	    MessageBox dialog =
 		    new MessageBox(UiDesk.getTopShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-	    dialog.setText("Unvollständiges Profil");
+	    dialog.setText(Messages.Cst_Text_profil_unvollstaendig);
 	    dialog.setMessage(Messages.Cst_Text_profil_hat_keine_gruppen);
 
 	    // open dialog and await user selection
@@ -1172,9 +1181,8 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    public void run() {
 
 		/*
-		 * TODO: opening this dialog takes a long time since it lists
-		 * all contacts. this should be moved into an asyncexec method
-		 * and get a progress bar.
+		 * TODO: Denkfehler: asyncExec bringt gar nix mit einem blockenden Dialog!!
+		 * 
 		 */
 
 		UiDesk.asyncExec(new Runnable() {
@@ -1195,7 +1203,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			    return;
 			}
 
-			CstProfile selGroup = (CstProfile) selItem[0].getData();
+			CstProfile selProfile = (CstProfile) selItem[0].getData();
 
 			dialog = new CstCopyProfileDialog(tableViewerProfiles.getControl().getShell());
 			dialog.create();
@@ -1211,7 +1219,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			    Mandant m = CoreHub.actMandant;
 			    if (m != null) {
 				CstService service = new CstService();
-				service.copyProfile(selGroup, selPatient, m);
+				service.copyProfile(selProfile, selPatient, m);
 			    }
 			}
 
@@ -1343,6 +1351,16 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		}
 	    }
 	};
+    }
+
+    private CstProfile getSelectedProfile() {
+	TableItem[] selItem = tableProfile.getSelection();
+	if (selItem.length == 0) {
+	    return null;
+	} else {
+	    CstProfile selProf = (CstProfile) selItem[0].getData();
+	    return selProf;
+	}
     }
 
     /**
@@ -1553,6 +1571,14 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    case 1:
 		return labItem.getDescription();
 	    case 2:
+		/*
+		Object ranking = itemRanking.get(labItem.getName());
+		if (ranking == null) {
+		    showMessage("Error with Ranking. Reinitializing...");
+		    reinitRanking(getSelectedProfile());
+		}
+		 */
+
 		return String.valueOf(itemRanking.get(labItem.getName()));
 	    default:
 		return "?";
@@ -1591,6 +1617,15 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		CstGroup d1 = (CstGroup) e1;
 		CstGroup d2 = (CstGroup) e2;
 
+		/* for debugging, there were records that did not point to an 
+		 * existing cstgroup in cstgroup_profile_joint
+		 */
+		if (d1.getName() == null || d2.getName() == null) {
+		    System.out.println("d1: " + d1.getId());
+		    System.out.println("d2: " + d2.getId());
+
+		}
+
 		Integer r1 = (Integer) itemRanking.get(d1.getName());
 		Integer r2 = (Integer) itemRanking.get(d2.getName());
 		if (r1 == null || r2 == null) {
@@ -1623,13 +1658,5 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
     }
 
-    /*
-    public Font getBoldFont() {
-    return boldFont;
-    }*/
-
-    public Color getRED() {
-	return UiDesk.getColorFromRGB("FF1122");
-    }
 
 }

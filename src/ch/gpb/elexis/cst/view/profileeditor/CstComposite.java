@@ -5,7 +5,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 
-import ch.elexis.core.constants.Preferences;
 import ch.elexis.core.ui.UiDesk;
 
 /**
@@ -34,7 +33,8 @@ public abstract class CstComposite extends Composite {
 	BLACK = UiDesk.getColorFromRGB("000000");
 	WHITE = UiDesk.getColorFromRGB("000000");
 
-	titelFont = UiDesk.getFont(Preferences.USR_SMALLFONT);
+	//titelFont = UiDesk.getFont(Preferences.USR_SMALLFONT);
+	titelFont = UiDesk.getFont("Helvetica", 12, SWT.BOLD); //$NON-NLS-1$
 	fontBold = UiDesk.getFont("Helvetica", 12, SWT.BOLD); //$NON-NLS-1$
 	fontNormal = UiDesk.getFont("Helvetica", 9, SWT.NORMAL); //$NON-NLS-1$
 

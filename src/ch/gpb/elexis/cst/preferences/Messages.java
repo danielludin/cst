@@ -145,6 +145,7 @@ public class Messages extends NLS {
     public static String Cst_Text_startdatum;
     public static String Cst_Text_ausrichtung;
     public static String Cst_Text_profil_hat_keine_gruppen;
+    public static String Cst_Text_profil_unvollstaendig;
     public static String Cst_Text_a4hoch;
     public static String Cst_Text_a4quer;
     public static String Cst_Text_keine_vorwerte;
