@@ -1,5 +1,7 @@
 package ch.gpb.elexis.cst.widget;
 
+import static ch.gpb.elexis.cst.widget.CstCanvas.log;
+
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -130,7 +132,7 @@ public class CstDangerRangeCanvas extends CstCanvas {
 	    gc.fillGradientRectangle((xoffset + greenEnd - 20), yoffset, xLenToFill, 10, false);
 	} catch (Exception e1) {
 	    e1.printStackTrace();
-	    System.out.println("DangerRangeCanvas error: " + "greenEnd:" + greenEnd + " xLenToFill: " + xLenToFill
+	    log.error("DangerRangeCanvas error: " + "greenEnd:" + greenEnd + " xLenToFill: " + xLenToFill
 		    + "  " + "title: " + title + " " + e1.getMessage());
 	}
 

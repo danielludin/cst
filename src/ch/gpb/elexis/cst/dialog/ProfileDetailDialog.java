@@ -28,11 +28,8 @@ public class ProfileDetailDialog extends TitleAreaDialog {
 
 	protected String name;
 	private String validFrom;
-	// private String validTo;
 	protected String description;
 	private CDateTime cdtValidFrom;
-
-	// private CDateTime cdtValidTo;
 
 	public ProfileDetailDialog(Shell parentShell) {
 		super(parentShell);
@@ -90,14 +87,6 @@ public class ProfileDetailDialog extends TitleAreaDialog {
 			new CDateTime(container, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM | CDT.TEXT_TRAIL);
 		cdtValidFrom.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		
-		/*
-		 * Label lblValidTo = new Label(container, SWT.NONE);
-		 * lblValidTo.setText(Messages.CstProfile_ValidTo); cdtValidTo = new
-		 * CDateTime(container, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM |
-		 * CDT.TEXT_TRAIL); lblValidTo.setLayoutData(new GridData(SWT.FILL,
-		 * SWT.CENTER, false, false, 1, 1)); new Label(container, SWT.NONE); new
-		 * Label(container, SWT.NONE);
-		 */
 	}
 
 	@Override
@@ -145,11 +134,4 @@ public class ProfileDetailDialog extends TitleAreaDialog {
 		this.validFrom = validFrom;
 		cdtValidFrom.setSelection(CstService.getDateFromCompact(validFrom));
 	}
-
-	/*
-	 * public String getValidTo() { return validTo; }
-	 * 
-	 * public void setValidTo(String validTo) { this.validTo = validTo;
-	 * cdtValidTo.setSelection(getDateFromCompact(validTo)); }
-	 */
 }

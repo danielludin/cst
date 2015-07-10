@@ -12,12 +12,10 @@ public class ProfileSorter extends ViewerSorter {
     private boolean sortReverse = false;
 
     public ProfileSorter() {
-	// TODO Auto-generated constructor stub
     }
 
     public ProfileSorter(Collator collator) {
 	super(collator);
-	// TODO Auto-generated constructor stub
     }
 
     @Override

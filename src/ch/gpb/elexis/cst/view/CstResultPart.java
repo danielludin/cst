@@ -197,8 +197,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	public void runInUi(final ElexisEvent ev) {
 	    if (ev.getType() == ElexisEvent.EVENT_SELECTED) {
 
-		System.out.println("CstResultPart selected");
-
 		if ((patient == null) || (!patient.getId().equals(((Patient) ev.getObject()).getId()))) {
 		    patient = (Patient) ev.getObject();
 
@@ -555,7 +553,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		}*/
 
 		compoBefunde.setLayoutData(gdBefunde);
-		//System.out.println("Selected BefundArt: " + befundArt);
 		// when the befund is selected for display, search for a separator
 
 		String befundParameter = CstService.getBefundArtOfField(profile, befundFeld);
@@ -563,7 +560,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		String separator = CstService.getBefundArtSeparator(mAuswahl, befundFeld);
 		if (separator != null) {
 		    // Get Values for ValuePair
-		    //System.out.println("BefundArt: " + befundFeld + " with  separator: " + separator);
 		    List<ValuePairTimeline> values = getValuesForValuePairTimeline(patient, befundParameter,
 			    befundFeld, separator);
 
@@ -585,7 +581,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 		} else {
 		    // Get Values for SingleValue
-		    //System.out.println("BefundArt without separator: " + befundFeld);
 		    List<ValueSingleTimeline> values = getValuesForSingleValueTimeline(patient,
 			    befundParameter, befundFeld);
 
@@ -759,7 +754,7 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		    loader.save(selected, SWT.IMAGE_PNG);
 
 		} catch (Exception e) {
-		    System.err.println("Error saving png: " + e.toString());
+		    log.error("Error saving png: " + e.toString());
 		    showMessage("Error while saving PNG", e.getMessage());
 		} finally {
 		    image.dispose();
@@ -826,10 +821,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		    }
 		    sTitle = sTitle + " Datum: " + CstService.getReadableDateAndTime();
 
-		    /*
-		    if (patient != null) {
-		    sTitle = sTitle + " Datum: " + CstService.getReadableDateAndTime();
-		    }*/
 
 		    // get option (paging to A4/ in one piece)
 		    int pdfOutputOption = 0;
@@ -859,8 +850,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 		    BufferedImage bimage = ImageUtils.convertToAWT(image.getImageData());
 
-		    System.out.println("BufferedImage w:h: " + bimage.getWidth() + " / " + bimage.getHeight());
-
 		    // create an Itextt Image from AWT BufferedImage
 		    com.lowagie.text.Image itextImage = null;
 		    java.awt.Image awtImage = null;
@@ -870,7 +859,7 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 			itextImage = com.lowagie.text.Image.getInstance(awtImage, null);
 
 		    } catch (Exception e) {
-			System.out.println("Error on image loading: " + e.toString());
+			log.error("Error on image loading: " + e.toString());
 			e.printStackTrace();
 		    }
 
@@ -950,21 +939,13 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 			document.open();
 
-			System.out.println("itext image w: " + itextImage.getWidth() + " h:" + itextImage.getHeight());
+			//System.out.println("itext image w: " + itextImage.getWidth() + " h:" + itextImage.getHeight());
 
 			if (onePage) {
 
 			    int scale = 66;
 			    itextImage.scalePercent(scale);
 
-			    /*
-			    System.out.println("scaled width: " + itextImage.getScaledWidth());
-			    System.out.println("scaled height: " + itextImage.getScaledHeight());
-
-			    System.out.println("doc pagesize width: " + document.getPageSize().getWidth());
-			    System.out.println("doc pagesize height: " + document.getPageSize().getHeight());
-			    */
-			    //
 			    document.add(itextImage);
 
 			} else {
@@ -981,7 +962,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 					- document.rightMargin();
 				float imgHeigth = itextImage.getHeight() * 0.75f;
 
-				//System.out.println("Scaling w/h: " + imgWidth + " / " + imgHeigth);
 
 				itextImage2.setAbsolutePosition(30, 20);
 				int scale = 66;
@@ -1000,7 +980,7 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 			///////////////////////////////
 
 		    } catch (Exception ex) {
-			System.err.println(ex.getMessage());
+			log.error(ex.getMessage());
 			showMessage("Error while generating PDF", ex.getMessage());
 		    }
 

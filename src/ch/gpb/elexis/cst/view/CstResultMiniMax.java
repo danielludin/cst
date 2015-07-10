@@ -68,12 +68,7 @@ public class CstResultMiniMax extends CstResultPart {
 
 	    Label labelPatientName = new Label(baseComposite, SWT.NONE);
 	    labelPatientName.setLayoutData(new GridData());
-	    /*
-	     labelPatientName
-	        .setText(Messages.Cst_Text_Interpretation_Mitochondrienlabor + " (" + profile.getName() + ") "
-	    	    + Messages.Cst_Text_fuer + " " + patient.getName() + " " + patient.getVorname() + " "
-	    	    + patient.getGeburtsdatum());
-	    */
+
 	    labelPatientName.setText(getHeader(patient));
 
 	    labelPatientName.setSize(600, 40);
@@ -82,15 +77,7 @@ public class CstResultMiniMax extends CstResultPart {
 	    Label labelProfileData = new Label(baseComposite, SWT.NONE);
 	    labelProfileData.setLayoutData(new GridData());
 
-	    /*
-	    labelProfileData
-	        .setText(Messages.CstProfileEditor_Datum + ": "
-	    	    + CstService.getGermanFromDate(new Date()) + "    ("
-	    	    + Messages.Cst_Text_Auswertungstyp_effektiv + " "
-	    	    + Messages.Cst_Text_startdatum + " "
-	    	    + CstService.getGermanFromCompact(aProfile.getValidFrom()) + " "
-	    	    + Messages.CstProfileEditor_Crawlback + " " + aProfile.getCrawlBack() + ")");
-	    */
+
 	    labelProfileData.setText(getSubTitle(patient, aProfile));
 
 	    labelProfileData.setSize(600, 40);
@@ -103,7 +90,6 @@ public class CstResultMiniMax extends CstResultPart {
 
 	    List<CstGroup> cstGroups = aProfile.getCstGroups();
 	    Collections.sort(cstGroups, groupSorter);
-	    //System.out.println("Number of groups: " + cstGroups.size());
 
 	    for (CstGroup group : cstGroups) {
 		List<LabItem> labitems = group.getLabitems();
@@ -232,7 +218,6 @@ public class CstResultMiniMax extends CstResultPart {
 
 	    int pageCnt = currentHeigth / printHeigth;
 	    int rmn = ((pageCnt + 1) * printHeigth) - currentHeigth;
-	    //System.out.println("Pagebreak: pageCnt/rmn: " + pageCnt + " / " + rmn);
 
 	    if (rmn < printHeigth) {
 		addLine(baseComposite, rmn);

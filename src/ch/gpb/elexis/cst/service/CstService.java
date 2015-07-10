@@ -63,22 +63,7 @@ public class CstService {
 	return diff;
     }
 
-    /*
-    public static long getDayCount(String start, String end) {
-    long diff = -1;
-    try {
-        Date dateStart = simpleDateFormat.parse(start);
-        Date dateEnd = simpleDateFormat.parse(end);
 
-        // time is always 00:00:00 so rounding should help to ignore the
-        // missing hour when going from winter to summer time as well as the
-        // extra hour in the other direction
-        diff = Math.round((dateEnd.getTime() - dateStart.getTime()) / (double) 86400000);
-    } catch (Exception e) {
-        // handle the exception according to your own situation
-    }
-    return diff;
-    }*/
 
     /**
      * Copies the profile to a list of patients
@@ -98,21 +83,6 @@ public class CstService {
 
 	    log.info("created new profile with id: " + newProfile.getId());
 
-	    //source.get
-
-	    /*
-	    Map<Object, Object> itemRanking = (Map<Object, Object>) source.getMap(CstGroup.ITEMRANKING);
-
-	    Map<Object, Object> mapAuswahl = source.getMap(CstProfile.KEY_AUSWAHLBEFUNDE);
-	    if (mapAuswahl != null) {
-	    newProfile.setMap(CstProfile.KEY_AUSWAHLBEFUNDE, mapAuswahl);
-	    } else {
-	    Hashtable<Object, Object> map = new Hashtable<Object, Object>();
-	    newProfile.setMap(CstProfile.KEY_AUSWAHLBEFUNDE, map);
-
-	    }*/
-
-	    //newProfile.addItems(cstgroups);
 
 	    CstService.copyProfile(source, newProfile);
 
@@ -353,7 +323,6 @@ public class CstService {
 	ArrayList<String> values = new ArrayList<String>();
 
 	while (matcher.find()) {
-	    //System.out.println("" + matcher.group());
 	    values.add(matcher.group());
 	}
 	Collections.sort(values); // Sort the arraylist
@@ -365,7 +334,6 @@ public class CstService {
 	    e.printStackTrace();
 	    log.debug("Error extracting maximal value: " + e.toString());
 	}
-	//System.out.println("maxValue: " + maxValue);
 	return maxValue;
     }
 
@@ -398,7 +366,6 @@ public class CstService {
 	while (itKeys.hasNext()) {
 	    Object key = (Object) itKeys.next();
 	    if (key.equals(sBefundName)) {
-		//result = ((Boolean) mapAuswahl.get(key)).booleanValue();
 		if (!mapAuswahl.get(key).toString().equals("false")) {
 		    result = true;
 		}
@@ -454,42 +421,18 @@ public class CstService {
 	    Object key = (Object) itKeys.next();
 	    String sepKey = "separator_" + befundArt;
 
-	    //System.out.println("Comparing key/befundArt: " + key + "/" + befundArt);
 	    if (key.equals(sepKey)) {
 
 		result = ((String) mapAuswahl.get(key));
 		if (result.length() == 0) {
 		    result = null;
 		}
-		//System.out.println("result: " + result);
 		break;
 	    }
 	}
 
 	return result;
     }
-
-    /*
-    public static String getBefundArtOfField(String fieldName) {
-
-    String befundArt = null;
-    Messwert setup = Messwert.getSetup();
-    Map<String, String> hash = setup.getMap(Messwert.FLD_BEFUNDE);
-
-    Set<String> keys = hash.keySet();
-    Iterator<String> it = keys.iterator();
-    while (it.hasNext()) {
-        String key = it.next();
-        String fields = hash.get(key);
-        if (fields.contains(fieldName)) {
-    	befundArt = key.replace("_FIELDS", "");
-    	return befundArt;
-        }
-    }
-
-    return befundArt;
-
-    }*/
 
     public static String getBefundArtOfField(CstProfile profile, String fieldName) {
 	Map<Object, Object> mAuswahl = profile.getMap(CstProfile.KEY_AUSWAHLBEFUNDE);
@@ -547,13 +490,6 @@ public class CstService {
 		    List<LabResult> res = (List<LabResult>) obj;
 
 		    for (LabResult labResult : res) {
-
-			/*
-			System.out.println("Trying Labresult Label:" + labResult.getLabel() + " Itemname: "
-				+ labResult.getItem().getName() + " / " + labResult.getDate()
-				+ ": " + labResult.getResult()
-				);
-			 */
 
 			// TODO: this lengthy condition is required, because sometimes the
 			// Labitems seem to be intermixed (ie HGB / Hämoglobin and LDH / LDH Elektrophorese)
@@ -759,24 +695,6 @@ public class CstService {
 
     }
 
-    /*
-
-    class LabResultComparator implements Comparator<LabResult> {
-
-    @Override
-    public int compare(LabResult b1, LabResult b2) {
-        if (b1.getResult() == null && b2.getResult() == null) {
-    	return 0;
-        }
-        if (b1.getResult() == null) {
-    	return 1;
-        }
-        if (b2.getResult() == null) {
-    	return -1;
-        }
-        return b1.getResult().compareTo(b2.getResult());
-    }
-    }*/
 
     public static String getReadableFromCompact(String sDate) {
 	Date date = getDateFromCompact(sDate);

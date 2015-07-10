@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -122,7 +121,7 @@ public class CstThemenblockEditor extends ViewPart implements
     private List<LabItem> labItems = new ArrayList<LabItem>();
     private List<LabItem> dialogLabItems = new ArrayList<LabItem>();
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    static Random rnd = new Random();
+    //static Random rnd = new Random();
     Patient patient;
     Label labelLeft;
     Text txtAbstract;
@@ -412,7 +411,7 @@ public class CstThemenblockEditor extends ViewPart implements
 			text = "default";
 		    } else {
 			text = abst.getDescription1();
-			System.out.println("desc: " + abst.getDescription1());
+			log.debug("desc: " + abst.getDescription1());
 		    }
 		    txtAbstract.setText(text);
 		}
@@ -722,7 +721,6 @@ public class CstThemenblockEditor extends ViewPart implements
 		}
 
 		CstGroup selGroup = (CstGroup) selItem[0].getData();
-		System.out.println("group ID:" + selGroup.getId());
 
 		String sMsg = String.format(
 			Messages.Cst_Text_confirm_delete_group,
@@ -756,7 +754,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		    return;
 		}
 		LabItem labItem = (LabItem) selItem[0].getData();
-		System.out.println("LabItem ID:" + labItem.getId());
+		log.debug("LabItem ID:" + labItem.getId());
 
 		selGroup.removeLabitem(labItem);
 
@@ -847,7 +845,7 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	itemRanking = (Map) ranking.clone();
 	selGroup.setMap(CstGroup.ITEMRANKING, ranking);
-	System.out.println("reinitialize the ranking");
+	log.debug("reinitialize the ranking");
 
 	tableViewerLabItem.refresh();
     }
@@ -858,7 +856,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		// add a new LabItem to the Category
 		TableItem[] selItem = tableCstGroup.getSelection();
 		selItem[0].getData();
-		System.out.println("doubleclick on CST CAT");
+
 		ISelection selection = tableViewerCstGroup.getSelection();
 		Object obj = ((IStructuredSelection) selection)
 			.getFirstElement();
@@ -870,8 +868,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		dialog.create();
 		dialog.setName(profile.getName());
 		dialog.setDescription(profile.getDescription());
-		System.out.println("setting name: " + profile.getName());
-		System.out.println("setting description: " + profile.getDescription());
+
 
 		if (dialog.open() == Window.OK) {
 		    profile.setName(dialog.getName());

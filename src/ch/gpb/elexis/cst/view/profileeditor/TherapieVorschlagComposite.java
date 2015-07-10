@@ -76,7 +76,6 @@ public class TherapieVorschlagComposite extends CstComposite {
     }
     public void setTextTherapie(String textTherapie) {
 	this.txtTherapie.setText(textTherapie);
-	//System.out.println("set text ther.: " + txtTherapie.getText());
     }
 
 
@@ -85,7 +84,6 @@ public class TherapieVorschlagComposite extends CstComposite {
     }
     public void setTextDiagnose(String textDiagnose) {
 	this.txtDiagnose.setText(textDiagnose);
-	//System.out.println("set text diag.: " + txtDiagnose.getText());
     }
 
     public void clear() {

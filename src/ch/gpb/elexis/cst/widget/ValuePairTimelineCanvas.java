@@ -224,13 +224,6 @@ public class ValuePairTimelineCanvas extends Canvas {
 	gc.dispose();
     }
 
-    /*
-    private long getNrOfDaysBetween(Date dStart, Date dEnd) {		
-        long diff = dEnd.getTime() - dStart.getTime();
-        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-    	return days;
-    }
-    */
 
     private double getHighestValueInFindings() {
 	if (findings.size() == 0) {

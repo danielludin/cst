@@ -71,7 +71,7 @@ public class Messages extends NLS {
     public static String Cst_Text_bis;
     public static String Cst_Text_Profile_fuer;
     public static String Cst_Text_ungueltiger_Wert;
-    public static String Cst_Text_Themenblock_existiert;
+    //public static String Cst_Text_Themenblock_existiert;
     public static String Cst_Text_create_cstgroup;
     public static String Cst_Text_create_cstgroup_tooltip;
     public static String Cst_Text_create_cstprofile;
@@ -165,16 +165,16 @@ public class Messages extends NLS {
     public static String HilfeComposite_hilfe_text_cstdocuments;
     public static String HilfeComposite_hilfe_titel_cstdocuments;
     public static String CstCategoryDialog_lblNewLabel_text;
-    public static String AnzeigeOptionsComposite_grpAusrichtung_text;
-    public static String AnzeigeOptionsComposite_btnAQuer_text;
-    public static String AnzeigeOptionsComposite_btnNewButton_text;
-    public static String AnzeigeOptionsComposite_btnRadioButton_text;
-    public static String AnzeigeOptionsComposite_btnRadioButton_1_text;
+    //public static String AnzeigeOptionsComposite_grpAusrichtung_text;
+    //public static String AnzeigeOptionsComposite_btnAQuer_text;
+    //public static String AnzeigeOptionsComposite_btnNewButton_text;
+    //public static String AnzeigeOptionsComposite_btnRadioButton_text;
+    //public static String AnzeigeOptionsComposite_btnRadioButton_1_text;
     public static String TemplateComposite_is_template;
     public static String TemplateComposite_template_settings;
     public static String TemplateComposite_template_title;
     public static String TemplateComposite_OutputHeader;
-    public static String TemplateComposite_text_text;
+    //public static String TemplateComposite_text_text;
 
     static {
 	// load message values from bundle file

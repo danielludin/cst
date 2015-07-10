@@ -154,7 +154,6 @@ public class ImageUtils {
 		//Initialize the image array with image chunks
 
 		int imageType = image.getType();
-		System.out.println("image type: " + imageType);
 		if (imageType == 0) {
 		    imageType = 5;
 		}
@@ -168,13 +167,11 @@ public class ImageUtils {
 		gr.dispose();
 	    }
 	}
-	System.out.println("Splitting done");
 
 	//writing mini images into image files
 	for (int i = 0; i < imgs.length; i++) {
 	    ImageIO.write(imgs[i], "jpg", new File("D:\\tmp", "img" + i + ".jpg"));
 	}
-	System.out.println("Mini images created");
 
 	return imgs;
 

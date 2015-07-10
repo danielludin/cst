@@ -62,7 +62,6 @@ public class CstDocumentsComposite extends CstComposite {
     String sIdentOmnivore;
 
     public CstDocumentsComposite(Composite parent, IViewSite viewsite) {
-	//public CstDocumentsComposite(Composite parent, IViewSite viewsite) {
 	super(parent, SWT.NONE);
 	this.viewsite = viewsite;
 
@@ -144,7 +143,6 @@ public class CstDocumentsComposite extends CstComposite {
 	makeActions();
 	hookDoubleClickAction();
 
-	//parent.getDisplay().
     }
 
     // dynamic Layout elements
@@ -232,12 +230,11 @@ public class CstDocumentsComposite extends CstComposite {
 
 		    boolean opened = tv.openDocument(Brief.load(brief.getId()));
 
-		    System.out.println("opened: " + opened);
 		} catch (PartInitException e) {
 			ExHandler.handle(e);
 		}
 		catch (Exception e) {
-		    System.out.println("cannot open letter: " + e.getMessage());
+		    log.error("cannot open letter: " + e.getMessage());
 		}
 
 	    }
@@ -263,22 +260,11 @@ public class CstDocumentsComposite extends CstComposite {
 
 	    Query<Brief> qbe = new Query<Brief>(Brief.class);
 	    qbe.add(Brief.FLD_PATIENT_ID, Query.EQUALS, actPat.getId());
-	    //qbe.add(Brief.FLD_SUBJECT, Query.LIKE, "CST");
 
-	    /*
-	    String cat = "all";
-	    if (cat.equals("all")) { //$NON-NLS-1$
-	    qbe.add(Brief.FLD_TYPE, Query.NOT_EQUAL, Brief.TEMPLATE);
-	    } else {
-	    qbe.add(Brief.FLD_TYPE, Query.EQUALS, cat);
-	    }
-	    */
-	    //cv.getConfigurer().getControlFieldProvider().setQuery(qbe);
+
 	    List<Brief> listResult = new ArrayList<>();
 	    List<Brief> list = qbe.execute();
 	    for (Brief brief : list) {
-		//System.out.println("brief: " + brief.getId());
-
 		// TODO: this must be configurable (Preferences)
 		if (brief.getBetreff().toLowerCase().indexOf(sIdentBriefe.toLowerCase()) > -1) {
 		    listResult.add(brief);

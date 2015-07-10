@@ -7,6 +7,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.ui.UiDesk;
 
@@ -29,6 +31,7 @@ public class CstCanvas extends Canvas {
     static Color BRIGHTGREEN;
     static Color ORANGE;
     static Color BLACK;
+    protected static Logger log = LoggerFactory.getLogger(CstCanvas.class.getName());
 
     public CstCanvas(Composite parent, int style) {
 	super(parent, style);

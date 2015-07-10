@@ -172,7 +172,6 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	    public void widgetSelected(SelectionEvent event) {
 		Button button = ((Button) event.widget);
 		System.out.print(button.getText());
-		System.out.println(" selected = " + button.getSelection());
 
 		if (button.getData().equals(CstProfile.ANZEIGETYP_EFFEKTIV)) {
 		    lblCrawlback.setForeground(GREEN);

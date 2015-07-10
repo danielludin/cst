@@ -40,9 +40,6 @@ import ch.gpb.elexis.cst.preferences.Messages;
 public class CstLabItemSelectionDialog extends SelectionDialog {
 	private Table table;
 
-	//	private Text txtFirstName;
-	//	private Text lastNameText;
-
 	private String firstName;
 	private String lastName;
 	private CheckboxTableViewer tableViewer;

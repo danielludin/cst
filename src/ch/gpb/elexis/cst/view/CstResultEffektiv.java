@@ -69,8 +69,6 @@ public class CstResultEffektiv extends CstResultPart {
 	    HashMap<String, HashMap<String, HashMap<String, List<LabResult>>>> labResults = LabResult
 		    .getGrouped(patient);
 
-	    //CstService.printLaborwerte(labResults);
-
 	    // the bottom most entry is the newest date
 	    List<String> sortedDates = CstService.getDistinctDates(labResults);
 
@@ -88,12 +86,7 @@ public class CstResultEffektiv extends CstResultPart {
 
 	    Label labelPatientName = new Label(baseComposite, SWT.NONE);
 	    labelPatientName.setLayoutData(new GridData());
-	    /*
-	    labelPatientName
-	        .setText(Messages.Cst_Text_Interpretation_Mitochondrienlabor + " (" + profile.getName() + ") "
-	    	    + Messages.Cst_Text_fuer + " " + patient.getName() + " " + patient.getVorname() + " "
-	    	    + patient.getGeburtsdatum());
-	    	    */
+
 	    labelPatientName.setText(getHeader(patient));
 
 	    labelPatientName.setSize(600, 40);
@@ -101,15 +94,6 @@ public class CstResultEffektiv extends CstResultPart {
 
 	    Label labelProfileData = new Label(baseComposite, SWT.NONE);
 	    labelProfileData.setLayoutData(new GridData());
-	    /*
-	     labelProfileData
-	        .setText(Messages.CstProfileEditor_Datum + ": "
-	    	    + CstService.getGermanFromDate(new Date()) + "    ("
-	    	    + Messages.Cst_Text_Auswertungstyp_effektiv + " "
-	    	    + Messages.Cst_Text_startdatum + " "
-	    	    + CstService.getGermanFromCompact(aProfile.getValidFrom()) + " "
-	    	    + Messages.CstProfileEditor_Crawlback + " " + aProfile.getCrawlBack() + ")");
-	    	    */
 	    labelProfileData.setText(getSubTitle(patient, aProfile));
 
 	    labelProfileData.setSize(600, 40);
@@ -193,8 +177,6 @@ public class CstResultEffektiv extends CstResultPart {
 		    rightCompo.setBackground(WHITE);
 
 		    newHeigth += (lineCompo.getSize().y);
-		    //pageHeigth += (lineCompo.getSize().y);
-		    //System.out.println("new heigth 2: " + newHeigth);
 
 		    // neuestes Datum aus der Liste der in den LabResults vorhandenen Daten holen
 		    String sDateOfLatestLabresult = sortedDates.get(sortedDates.size() - 1);
@@ -472,7 +454,6 @@ public class CstResultEffektiv extends CstResultPart {
 
 	    int pageCnt = currentHeigth / printHeigth;
 	    int rmn = ((pageCnt + 1) * printHeigth) - currentHeigth;
-	    //System.out.println("Pagebreak: pageCnt/rmn: " + pageCnt + " / " + rmn);
 
 	    if (rmn < printHeigth) {
 		addLine(baseComposite, rmn);

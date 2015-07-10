@@ -14,7 +14,6 @@ public class HilfeComposite extends CstComposite {
     public HilfeComposite(Composite parent) {
 	super(parent, SWT.NONE);
 
-
 	//SWTResourceManager.
 	GridLayout gridLayout = new GridLayout(2, false);
 	setLayout(gridLayout);
@@ -37,7 +36,6 @@ public class HilfeComposite extends CstComposite {
 	lblTitelCstGroups.setText(Messages.HilfeComposite_hilfe_titel_cstgroups);
 	lblTitelCstGroups.setFont(fontNormal);
 	lblTitelCstGroups.setForeground(titelColor);
-	//lblTitelCstGroups.setImage(UiDesk.getImage(Activator.IMG_CSTGROUP_NAME));
 
 	Label lblTextCstGroups = new Label(this, SWT.NONE);
 	lblTextCstGroups.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));

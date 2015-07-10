@@ -38,250 +38,243 @@ import ch.gpb.elexis.cst.preferences.Messages;
  */
 
 public class CstGroupSelectionDialog extends SelectionDialog {
-	private Table table;
+    private Table table;
 
+    private String firstName;
+    private String lastName;
+    private CheckboxTableViewer tableViewer;
+    private List<CstGroup> cstgroupItems;
+    private List<CstGroup> selItems;
 
-	private String firstName;
-	private String lastName;
-	private CheckboxTableViewer tableViewer;
-	private List<CstGroup> cstgroupItems;
-	private List<CstGroup> selItems;
-	
-	public List<CstGroup> getSelItems() {
-		return selItems;
+    public List<CstGroup> getSelItems() {
+	return selItems;
+    }
+
+    public void setSelItems(List<CstGroup> selItems) {
+	this.selItems = selItems;
+    }
+
+    private int sortColumn = 0;
+    private boolean sortReverse = false;
+
+    public CstGroupSelectionDialog(Shell parentShell) {
+	super(parentShell);
+    }
+
+    public CstGroupSelectionDialog(Shell parentShell, List<CstGroup> cstgroupItems) {
+	super(parentShell);
+	this.cstgroupItems = cstgroupItems;
+    }
+
+    @Override
+    public void create() {
+	super.create();
+	setTitle(Messages.Cst_Text_Gruppenauswahl);
+	setMessage(Messages.Cst_Text_Gruppenauswahl_label);
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
+	Composite area = (Composite) super.createDialogArea(parent);
+	Composite container = new Composite(area, SWT.NONE);
+
+	container.setLayoutData(new GridData(GridData.FILL_BOTH));
+	GridLayout layout = new GridLayout(2, false);
+	container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	container.setLayout(layout);
+	/*
+	 * 
+	 * createFirstName(container); createLastName(container);
+	 */
+	table = new Table(container, SWT.CHECK | SWT.SINGLE | SWT.H_SCROLL
+		| SWT.V_SCROLL | SWT.FULL_SELECTION);
+
+	String[] colLabels = getColumnLabels();
+	int columnWidth[] = getColumnWidth();
+	SortListener sortListener = new SortListener();
+	TableColumn[] cols = new TableColumn[colLabels.length];
+	for (int i = 0; i < colLabels.length; i++) {
+	    cols[i] = new TableColumn(table, SWT.NONE);
+	    cols[i].setWidth(columnWidth[i]);
+	    cols[i].setText(colLabels[i]);
+	    cols[i].setData(new Integer(i));
+	    cols[i].addSelectionListener(sortListener);
+	}
+	GridData gridDataTable = new GridData();
+	gridDataTable.horizontalAlignment = GridData.FILL;
+	gridDataTable.verticalAlignment = GridData.FILL;
+	gridDataTable.grabExcessHorizontalSpace = true;
+	gridDataTable.grabExcessVerticalSpace = true;
+	table.setLayoutData(gridDataTable);
+
+	table.setHeaderVisible(true);
+	table.setLinesVisible(true);
+
+	tableViewer = new CheckboxTableViewer(table);
+	tableViewer.setContentProvider(new ViewContentProvider());
+	tableViewer.setLabelProvider(new ViewLabelProvider());
+	tableViewer.setSorter(new Sorter());
+
+	tableViewer.setInput(this);
+
+	return area;
+    }
+
+    private String[] getColumnLabels() {
+	String columnLabels[] = { Messages.CstLaborPrefs_name,
+		Messages.CstLaborPrefs_short, Messages.CstLaborPrefs_unit,
+		Messages.CstLaborPrefs_type, Messages.CstLaborPrefs_sortmode };
+	return columnLabels;
+    }
+
+    private int[] getColumnWidth() {
+	int columnWidth[] = { 120, 150, 200, 200, 500 };
+	return columnWidth;
+    }
+
+    @Override
+    protected boolean isResizable() {
+	return true;
+    }
+
+    @Override
+    protected void okPressed() {
+	selItems = new ArrayList<CstGroup>();
+	Object[] checkedItems = tableViewer.getCheckedElements();
+	for (Object object : checkedItems) {
+	    CstGroup labItem = (CstGroup) object;
+	    selItems.add(labItem);
+	}
+	super.okPressed();
+    }
+
+    public String getFirstName() {
+	return firstName;
+    }
+
+    public String getLastName() {
+	return lastName;
+    }
+
+    class ViewContentProvider implements IStructuredContentProvider {
+	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 	}
 
-	public void setSelItems(List<CstGroup> selItems) {
-		this.selItems = selItems;
+	public void dispose() {
 	}
 
-	private int sortColumn = 0;
-	private boolean sortReverse = false;
+	public Object[] getElements(Object parent) {
+	    return cstgroupItems.toArray();
+	}
+    }
 
-	public CstGroupSelectionDialog(Shell parentShell) {
-		super(parentShell);
+    class ViewLabelProvider extends LabelProvider implements
+	    ITableLabelProvider, ITableFontProvider, IColorProvider {
+	public String getColumnText(Object obj, int index) {
+	    CstGroup labItem = (CstGroup) obj;
+	    switch (index) {
+	    case 0:
+		return labItem.getName();
+	    case 1:
+		return labItem.getLabel();
+	    case 2:
+		return labItem.getName();
+	    case 3:
+		return labItem.getName();
+	    case 4:
+		return labItem.getName();
+	    default:
+		return "?";
+	    }
 	}
 
-	public CstGroupSelectionDialog(Shell parentShell, List<CstGroup> cstgroupItems) {
-		super(parentShell);
-		this.cstgroupItems = cstgroupItems;
+	public Image getColumnImage(Object obj, int index) {
+	    return null;
+	}
+
+	public Image getImage(Object obj) {
+	    return PlatformUI.getWorkbench().getSharedImages()
+		    .getImage(ISharedImages.IMG_OBJ_ELEMENT);
+	}
+
+	public Font getFont(Object element, int columnIndex) {
+	    Font font = null;
+	    return font;
 	}
 
 	@Override
-	public void create() {
-		super.create();
-		setTitle(Messages.Cst_Text_Gruppenauswahl);
-		setMessage(Messages.Cst_Text_Gruppenauswahl_label);
+	public Color getForeground(Object element) {
+	    return null;
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
-		Composite area = (Composite) super.createDialogArea(parent);
-		Composite container = new Composite(area, SWT.NONE);
-		
-		container.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layout = new GridLayout(2, false);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		container.setLayout(layout);
-		/*
-		 * 
-		 * createFirstName(container); createLastName(container);
-		 */
-		table = new Table(container, SWT.CHECK | SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION);
-
-		String[] colLabels = getColumnLabels();
-		int columnWidth[] = getColumnWidth();
-		SortListener sortListener = new SortListener();
-		TableColumn[] cols = new TableColumn[colLabels.length];
-		for (int i = 0; i < colLabels.length; i++) {
-			cols[i] = new TableColumn(table, SWT.NONE);
-			cols[i].setWidth(columnWidth[i]);
-			cols[i].setText(colLabels[i]);
-			cols[i].setData(new Integer(i));
-			cols[i].addSelectionListener(sortListener);
-		}
-		GridData gridDataTable = new GridData();
-		gridDataTable.horizontalAlignment = GridData.FILL;
-		gridDataTable.verticalAlignment = GridData.FILL;
-		gridDataTable.grabExcessHorizontalSpace = true;
-		gridDataTable.grabExcessVerticalSpace = true;
-		table.setLayoutData(gridDataTable);
-
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-
-		tableViewer = new CheckboxTableViewer(table);
-		tableViewer.setContentProvider(new ViewContentProvider());
-		tableViewer.setLabelProvider(new ViewLabelProvider());
-		tableViewer.setSorter(new Sorter());
-
-		tableViewer.setInput(this);
-
-		return area;
+	public Color getBackground(Object element) {
+	    return null;
 	}
+    }
 
-	private String[] getColumnLabels() {
-		String columnLabels[] = { Messages.CstLaborPrefs_name,
-				Messages.CstLaborPrefs_short, Messages.CstLaborPrefs_unit,
-				Messages.CstLaborPrefs_type, Messages.CstLaborPrefs_sortmode };
-		return columnLabels;
-	}
-
-	private int[] getColumnWidth() {
-		int columnWidth[] = { 120, 150, 200, 200, 500 };
-		return columnWidth;
-	}
+    class SortListener extends SelectionAdapter {
 
 	@Override
-	protected boolean isResizable() {
-		return true;
+	public void widgetSelected(SelectionEvent e) {
+	    TableColumn col = (TableColumn) e.getSource();
+
+	    Integer colNo = (Integer) col.getData();
+
+	    if (colNo != null) {
+		if (colNo == sortColumn) {
+		    sortReverse = !sortReverse;
+		} else {
+		    sortReverse = false;
+		    sortColumn = colNo;
+		}
+		tableViewer.refresh();
+	    }
+
 	}
 
+    }
+
+    class Sorter extends ViewerSorter {
 
 	@Override
-	protected void okPressed() {
-		selItems = new ArrayList<CstGroup>();
-		Object[] checkedItems = tableViewer.getCheckedElements();
-		for (Object object : checkedItems) {
-			CstGroup labItem = (CstGroup)object;
-			selItems.add(labItem);
+	public int compare(Viewer viewer, Object e1, Object e2) {
+	    if ((e1 instanceof CstGroup) && (e2 instanceof CstGroup)) {
+		CstGroup d1 = (CstGroup) e1;
+		CstGroup d2 = (CstGroup) e2;
+		String c1 = "";
+		String c2 = "";
+		switch (sortColumn) {
+		case 0:
+		    c1 = d1.getName();
+		    c2 = d2.getName();
+		    break;
+		case 1:
+		    c1 = d1.getLabel();
+		    c2 = d2.getLabel();
+		    break;
+		case 2:
+		    c1 = d1.getName();
+		    c2 = d2.getName();
+		    break;
+		case 3:
+		    c1 = d1.getName();
+		    c2 = d2.getName();
+		    break;
+		case 4:
+		    c1 = d1.getName();
+		    c2 = d2.getName();
+		    break;
 		}
-		super.okPressed();
+		if (sortReverse) {
+		    return c1.compareTo(c2);
+		} else {
+		    return c2.compareTo(c1);
+		}
+	    }
+	    return 0;
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	class ViewContentProvider implements IStructuredContentProvider {
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-		}
-
-		public void dispose() {
-		}
-
-		public Object[] getElements(Object parent) {
-			return cstgroupItems.toArray();
-		}
-	}
-
-	class ViewLabelProvider extends LabelProvider implements
-			ITableLabelProvider, ITableFontProvider, IColorProvider {
-		public String getColumnText(Object obj, int index) {
-			CstGroup labItem = (CstGroup) obj;
-			switch (index) {
-			case 0:
-				return labItem.getName();
-			case 1:
-				return labItem.getLabel();
-			case 2:
-				return labItem.getName();
-			case 3:
-				return labItem.getName();
-			case 4:
-				return labItem.getName();
-			default:
-				return "?";
-			}
-		}
-
-		public Image getColumnImage(Object obj, int index) {
-			return null;
-		}
-
-		public Image getImage(Object obj) {
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJ_ELEMENT);
-		}
-
-		public Font getFont(Object element, int columnIndex) {
-			Font font = null;
-			return font;
-		}
-
-		@Override
-		public Color getForeground(Object element) {
-			return null;
-		}
-
-		@Override
-		public Color getBackground(Object element) {
-			return null;
-		}
-	}
-
-	class SortListener extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			TableColumn col = (TableColumn) e.getSource();
-
-			Integer colNo = (Integer) col.getData();
-
-			if (colNo != null) {
-				if (colNo == sortColumn) {
-					sortReverse = !sortReverse;
-				} else {
-					sortReverse = false;
-					sortColumn = colNo;
-				}
-				tableViewer.refresh();
-			}
-			Object[] labItems = (Object[]) tableViewer.getCheckedElements();
-
-			for (Object message : labItems) {
-				CstGroup labItem = (CstGroup) message;
-				System.out.println("checked cdamessage:" + labItem.getName());
-			}
-		}
-
-	}
-
-	class Sorter extends ViewerSorter {
-
-		@Override
-		public int compare(Viewer viewer, Object e1, Object e2) {
-			if ((e1 instanceof CstGroup) && (e2 instanceof CstGroup)) {
-				CstGroup d1 = (CstGroup) e1;
-				CstGroup d2 = (CstGroup) e2;
-				String c1 = "";
-				String c2 = "";
-				switch (sortColumn) {
-				case 0:
-					c1 = d1.getName();
-					c2 = d2.getName();
-					break;
-				case 1:
-					c1 = d1.getLabel();
-					c2 = d2.getLabel();
-					break;
-				case 2:
-					c1 = d1.getName();
-					c2 = d2.getName();
-					break;
-				case 3:
-					c1 = d1.getName();
-					c2 = d2.getName();
-					break;
-				case 4:
-					c1 = d1.getName();
-					c2 = d2.getName();
-					break;
-				}
-				if (sortReverse) {
-					return c1.compareTo(c2);
-				} else {
-					return c2.compareTo(c1);
-				}
-			}
-			return 0;
-		}
-
-	}
+    }
 
 }

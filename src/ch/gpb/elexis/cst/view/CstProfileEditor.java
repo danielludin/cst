@@ -183,7 +183,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		    patient = (Patient) ev.getObject();
 
 		    if (patient != null) {
-			System.out.println("Cst receives event with patient:" + patient.getName());
+			log.debug("Cst receives event with patient:" + patient.getName());
 			labelLeft.setText(Messages.Cst_Text_Profile_fuer + " " + patient.getName() + " "
 				+ patient.getVorname());
 			labelLeft.redraw();
@@ -512,14 +512,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			selProfile.setMap(CstGroup.ITEMRANKING, ranking);
 		    }
 
-		    /*
-		    Set keys = itemRanking.keySet();
-		    List lKeys = Arrays.asList(keys.toArray());
-		    Collections.sort(lKeys);
-		    System.out.println("ItemRanking for profile: " + selProfile.getName());
-		    for (Object obj : lKeys) {
-		    System.out.println("Itemranking: " + obj.toString() + " / " + itemRanking.get(obj));
-		    }*/
 
 		    loadCstProfile(selProfile);
 		    tableViewerCstGroups.refresh();
@@ -1054,7 +1046,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			    CstProfile profileTemplate = dialog.getProfileToCopyFrom();
 			    // was a profile selected as template to copy from?
 			    if (profileTemplate != null) {
-				System.out.println("Selected a profile to copy from: " + profileTemplate.getName());
+				log.debug("Selected a profile to copy from: " + profileTemplate.getName());
 				CstService.copyProfile(profileTemplate, target);
 
 			    } else {
@@ -1619,12 +1611,13 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
 		/* for debugging, there were records that did not point to an 
 		 * existing cstgroup in cstgroup_profile_joint
-		 */
+		 *
+		
 		if (d1.getName() == null || d2.getName() == null) {
 		    System.out.println("d1: " + d1.getId());
 		    System.out.println("d2: " + d2.getId());
 
-		}
+		}*/
 
 		Integer r1 = (Integer) itemRanking.get(d1.getName());
 		Integer r2 = (Integer) itemRanking.get(d2.getName());

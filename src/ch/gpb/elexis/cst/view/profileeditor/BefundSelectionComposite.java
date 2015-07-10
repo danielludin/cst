@@ -138,15 +138,10 @@ public class BefundSelectionComposite extends CstComposite {
 			    String txtData = ((Text) control).getData().toString();
 
 			    String sepKey = "separator_" + mNames[i].split(Messwert.SETUP_CHECKSEPARATOR)[0];
-			    //System.out.println("comparing: /" + txtData + "/" + sepKey + "/");
 
 			    if (txtData.equals(sepKey)) {
 				String separator = ((Text) control).getText();
 				mAuswahl.put(((Text) control).getData().toString(), separator);
-				/*
-				System.out.println("setting separator key/value: "
-					+ ((Text) control).getData().toString() + "/" + separator);
-				*/
 			    }
 			}
 

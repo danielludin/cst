@@ -296,7 +296,7 @@ public class CstProfile extends PersistentObject implements Comparable<CstProfil
 		j.exec(sql.toString());
 	    }
 	    else {
-		System.out.println("CSTGroup " + item.getName() + " already exists in CSTProfile :" + this.getName());
+		log.error("CSTGroup " + item.getName() + " already exists in CSTProfile :" + this.getName());
 		throw new IllegalArgumentException(String.format(
 			"CSTGroup of name [%s] - [%s] already exists", item.getName()));
 

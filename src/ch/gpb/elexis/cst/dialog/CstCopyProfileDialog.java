@@ -40,8 +40,6 @@ import ch.gpb.elexis.cst.preferences.Messages;
 
 public class CstCopyProfileDialog extends SelectionDialog {
     private Table table;
-    //	private Text txtFirstName;
-    //	private Text lastNameText;
     private String firstName;
     private String lastName;
     private CheckboxTableViewer tableViewer;
@@ -158,10 +156,7 @@ public class CstCopyProfileDialog extends SelectionDialog {
 	public Object[] getElements(Object parent) {
 
 	    if (lPats == null) {
-		System.out.println("no elements!");
-
 		lPats = qbe.execute();
-
 	    }
 	    return lPats.toArray(new Patient[0]);
 	}

@@ -118,15 +118,6 @@ public class ValueSingleTimelineCanvas extends Canvas {
 
 	long totalSpan = CstService.getNrOfDaysBetween(dStart, dEnd);
 
-	//	gc.setBackground(ORANGE);
-	//	// draw the x base line
-	//	gc.setForeground(GREY);
-	//	gc.drawRectangle(xoffBase, yoffBase, iPixX, 1);
-	//
-	//	// draw a title
-	//	gc.setFont(fontBig);
-	//	gc.drawText(String.valueOf(befundArt), 2, 0, true);
-
 	if (findings == null || findings.size() == 0) {
 	    return;
 	}
@@ -210,14 +201,6 @@ public class ValueSingleTimelineCanvas extends Canvas {
 	gc.dispose();
     }
 
-    /*
-    private long getNrOfDaysBetween(Date dStart, Date dEnd) {		
-        long diff = dEnd.getTime() - dStart.getTime();
-        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-    	return days;
-    }
-    */
-
     private double getHighestValueInFindings() {
 	double highest = 0;
 	try {
@@ -266,15 +249,8 @@ public class ValueSingleTimelineCanvas extends Canvas {
 	this.findings = findings;
 	Collections.sort(this.findings, new FindingsComparable());
 
-	/*
-	for (ValueSingleTimeline finding : findings) {
-		System.out.println("BdValue: " + finding.getDate() + "syst/diast:" +finding.getWeightKg());
-	}*/
-
 	double lowest = getLowestValueInFindings();
 	double highest = getHighestValueInFindings();
-	//	System.out.println("lowest: " + lowest);
-	//	System.out.println("highest: " + highest);
 
 	valueRangeOfInput = highest - lowest;
 	// 20 px is the distance between scale lines
@@ -305,13 +281,6 @@ public class ValueSingleTimelineCanvas extends Canvas {
 	}
 
 	this.werteBereich = rounded;
-
-	//	System.out.println("rounded: " + lowest);
-	//	System.out.println("highest: " + highest);
-	//	System.out.println("valueRangeOfInput: " + valueRangeOfInput);
-	//	System.out.println("distBetweenLines: " + distBetweenLines);
-	//	System.out.println("nrOfScaleLines: " + nrOfScaleLines);
-	//	System.out.println("scaleStepWidth: " + scaleStepWidth);
 
     }
 

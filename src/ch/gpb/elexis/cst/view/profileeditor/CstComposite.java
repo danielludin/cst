@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.ui.UiDesk;
 
@@ -23,6 +25,7 @@ public abstract class CstComposite extends Composite {
     Font fontNormal; //$NON-NLS-1$
 
     Color titelColor = UiDesk.getColorFromRGB("D90A0A");
+    protected Logger log = LoggerFactory.getLogger(CstComposite.class.getName());
 
     public CstComposite(Composite parent, int style) {
 	super(parent, style);
