@@ -56,6 +56,7 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.LabItem;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Prescription;
@@ -717,6 +718,10 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 	actionScreenshot = new Action() {
 	    public void run() {
+     if (profile == null) {
+       SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
+       return;
+     }
 
 		GC gc = null;
 		Image image = null;
@@ -779,6 +784,10 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	    public void run() {
 
 		//////////////////////////
+     if (profile == null) {
+       SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
+       return;
+     }
 
 		GC gc = null;
 		Image image = null;
@@ -1005,6 +1014,12 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		    }
 
 		} finally {
+      if (image != null) {
+        image.dispose();
+      }
+      if (gc != null) {
+        gc.dispose();
+      }
 		    image.dispose();
 		    gc.dispose();
 		}
