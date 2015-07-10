@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.gpb.elexis.cst.feature"
-      label="Neues Elexis-Plugin (neu) von Daniel Ludin"
+      label="Cellsymbiosistherapie-Elexis-Plugin von Gemeinschaftspraxis Brunnmatt/Daniel Ludin"
       version="1.0.0.qualifier"
       provider-name="elexis.info">
 
    <description>
-      Elexis-Plugin (neu) von Daniel Ludin
+      Elexis-Plugin zur Unterstützung der Cellsymbiosistherapie (CST) von Gemeinschaftspraxis Brunnmatt/Daniel Ludin
       Mehr Info unter http://wiki.elexis.info/ch.gpb.elexis.cst.feature.feature.group
    </description>
 
