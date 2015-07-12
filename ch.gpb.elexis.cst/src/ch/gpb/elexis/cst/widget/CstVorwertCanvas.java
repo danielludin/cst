@@ -24,20 +24,20 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
+import ch.gpb.elexis.cst.data.ValueFinding;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
-import ch.gpb.elexis.cst.test.Finding;
 
 public class CstVorwertCanvas extends CstCanvas {
 
     //Image pointer;
-    Finding finding;
+    ValueFinding finding;
     int iPixX = 480;
     int iPixY = 60;
     int xoffBase = 4;
     int yoffBase = 80;
 
-    List<Finding> findings = new ArrayList<Finding>();
+    List<ValueFinding> findings = new ArrayList<ValueFinding>();
 
     public CstVorwertCanvas(Composite parent, boolean a4Quer, int style) {
 	super(parent, style);
@@ -60,7 +60,7 @@ public class CstVorwertCanvas extends CstCanvas {
 
     public double getHightestValue() {
 	double highest = 0;
-	for (Finding finding : getFindings()) {
+	for (ValueFinding finding : getFindings()) {
 	    if (finding.getValue() > highest) {
 		highest = finding.getValue();
 	    }
@@ -135,7 +135,7 @@ public class CstVorwertCanvas extends CstCanvas {
 	gc.setForeground(BLACK);
 	for (int x = 0; x < findings.size(); x++) {
 
-	    Finding finding = findings.get(x);
+	    ValueFinding finding = findings.get(x);
 
 	    int yoff = 0;
 	    if (x % 2 == 0) {
@@ -172,27 +172,27 @@ public class CstVorwertCanvas extends CstCanvas {
 
     }
 
-    public Finding getFinding() {
+    public ValueFinding getFinding() {
 	return finding;
     }
 
-    public void setFinding(Finding finding) {
+    public void setFinding(ValueFinding finding) {
 	this.finding = finding;
     }
 
-    public List<Finding> getFindings() {
+    public List<ValueFinding> getFindings() {
 	return findings;
     }
 
-    public void setFindings(List<Finding> findings) {
+    public void setFindings(List<ValueFinding> findings) {
 	this.findings = findings;
 	Collections.sort(this.findings, new FindingsComparable());
     }
 
-    public class FindingsComparable implements Comparator<Finding> {
+    public class FindingsComparable implements Comparator<ValueFinding> {
 
 	@Override
-	public int compare(Finding o1, Finding o2) {
+	public int compare(ValueFinding o1, ValueFinding o2) {
 	    return o1.getDateOfFinding().compareTo(o2.getDateOfFinding());
 
 	}
@@ -203,7 +203,7 @@ public class CstVorwertCanvas extends CstCanvas {
 	//return super.toString();
 	StringBuffer result = new StringBuffer();
 	result.append("");
-	for (Finding finding : getFindings()) {
+	for (ValueFinding finding : getFindings()) {
 	    result.append("(" + CstService.getCompactFromDate(finding.getDateOfFinding()) + ":" + finding.getValue()
 		    + ")");
 	}

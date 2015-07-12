@@ -39,13 +39,10 @@ public class CstPreference extends FieldEditorPreferencePage implements IWorkben
 
     public static void initIdentifiers() {
 	if (CoreHub.userCfg.get(CST_IDENTIFIER_OMNIVORE, "notset").equals("notset")) {
-
 	    CoreHub.userCfg.set(CST_IDENTIFIER_OMNIVORE, getDefaultIdentifierOmnivore());
 	}
 
-
 	if (CoreHub.userCfg.get(CST_IDENTIFIER_BRIEFE, "notset").equals("notset")) {
-
 	    CoreHub.userCfg.set(CST_IDENTIFIER_BRIEFE, getDefaultIdentifierBriefe());
 	}
 
@@ -53,26 +50,17 @@ public class CstPreference extends FieldEditorPreferencePage implements IWorkben
 
     @Override
     protected void createFieldEditors() {
-
-	//	addField(new FontFieldEditor(Preferences.USR_DEFAULTFONT,
-	//		"Messages.FontPreference_standardschriftart", "Elexis", getFieldEditorParent())); //$NON-NLS-1$
-
 	addField(new StringFieldEditor(CST_IDENTIFIER_OMNIVORE, "Cst Omnivore Documents", getFieldEditorParent()));
 	addField(new StringFieldEditor(CST_IDENTIFIER_BRIEFE, "Cst Briefe", getFieldEditorParent()));
     }
 
     public void init(IWorkbench workbench) {
 	// TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean performOk() {
 	boolean ret = super.performOk();
-
-	//UiDesk.updateFont(Preferences.USR_DEFAULTFONT);
-	//CoreHub.userCfg.set(CST_IDENTIFIER_OMNIVORE, "wie übernimmt man den WErt1 vom gui?");
-	//CoreHub.userCfg.set(CST_IDENTIFIER_BRIEFE, "wie übernimmt man den wert2 vom gui?");
 
 	ElexisEventDispatcher.getInstance().fire(
 		new ElexisEvent(CoreHub.actUser, Anwender.class, ElexisEvent.EVENT_USER_CHANGED));

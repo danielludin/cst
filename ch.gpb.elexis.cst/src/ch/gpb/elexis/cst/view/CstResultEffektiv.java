@@ -32,9 +32,9 @@ import ch.elexis.data.LabResult;
 import ch.gpb.elexis.cst.data.CstAbstract;
 import ch.gpb.elexis.cst.data.CstGroup;
 import ch.gpb.elexis.cst.data.CstProfile;
+import ch.gpb.elexis.cst.data.ValueFinding;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
-import ch.gpb.elexis.cst.test.Finding;
 import ch.gpb.elexis.cst.widget.CstDangerRangeCanvas;
 import ch.gpb.elexis.cst.widget.CstVorwertCanvas;
 
@@ -343,7 +343,7 @@ public class CstResultEffektiv extends CstResultPart {
 		    dResult = CstService.getNumericFromLabResult(sResult);
 
 		    // Fetch the LabResults for the Vorwert Graphic
-		    List<Finding> findings = new ArrayList<Finding>();
+		    List<ValueFinding> findings = new ArrayList<ValueFinding>();
 
 		    Collections.reverse(datesForVorwert);
 
@@ -378,7 +378,7 @@ public class CstResultEffektiv extends CstResultPart {
 			double dResultV = 0;
 			dResultV = CstService.getNumericFromLabResult(sResultV);
 
-			Finding f = new Finding();
+			ValueFinding f = new ValueFinding();
 			if (patient.getGeschlecht().toLowerCase().equals("m")) {
 			    f.setRefMstart(dRangeStart);
 			    f.setRefMend(dRangeEnd);
