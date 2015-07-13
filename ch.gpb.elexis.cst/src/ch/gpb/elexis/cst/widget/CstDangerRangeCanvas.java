@@ -10,8 +10,6 @@
  *******************************************************************************/
 package ch.gpb.elexis.cst.widget;
 
-import static ch.gpb.elexis.cst.widget.CstCanvas.log;
-
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
