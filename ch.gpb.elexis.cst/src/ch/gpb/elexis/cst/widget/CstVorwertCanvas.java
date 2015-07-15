@@ -146,8 +146,27 @@ public class CstVorwertCanvas extends CstCanvas {
 
 	    // je grösser corrY desto höher wandert der Text
 	    int corrY = 10;
-	    gc.drawText(String.valueOf(finding.getValue()), xoffBase + new Double(xoff * xFactor).intValue(), yoffBase
-		    - new Double(finding.getValue() * yFactor).intValue() - corrY, true);
+
+	    if (!(finding.getParam().toLowerCase().indexOf("neg") > -1 ||
+		    finding.getParam().toLowerCase().indexOf("norm") > -1 ||
+		    finding.getParam().toLowerCase().indexOf("pos") > -1 ||
+		    finding.getParam().toLowerCase().indexOf("+") > -1 || finding.getParam().toLowerCase().indexOf("-") > -1)) {
+
+		gc.drawText(String.valueOf(finding.getValue()), xoffBase + new Double(xoff * xFactor).intValue(),
+			yoffBase
+				- new Double(finding.getValue() * yFactor).intValue() - corrY, true);
+	    }
+	    else {
+		String sDisplay = finding.getParam();
+		if (sDisplay.indexOf("-") > -1) {
+		    sDisplay = "negativ";
+		} else if (sDisplay.indexOf("+") > -1) {
+		    sDisplay = "positiv";
+		}
+		gc.drawText(sDisplay, xoffBase + new Double(xoff * xFactor).intValue(),
+			yoffBase - 12 - corrY, true);
+
+	    }
 
 	    if (x < findings.size() - 1) {
 		long lSpan = getNrOfDaysBetween(findings.get(0).getDateOfFinding(), findings.get(x + 1)

@@ -45,7 +45,7 @@ public class TherapieVorschlagComposite extends CstComposite {
 	labelTherapievorschlag.setText(Messages.CstProfileEditor_Therapievorschlag);
 	labelTherapievorschlag.setSize(200, 20);
 
-	txtTherapie = new Text(parent, SWT.MULTI);
+	txtTherapie = new Text(parent, SWT.V_SCROLL | SWT.MULTI);
 	txtTherapie.setData("therapie");
 
 	GridData gdTextTherapie = new GridData(GridData.FILL_HORIZONTAL);
@@ -66,7 +66,7 @@ public class TherapieVorschlagComposite extends CstComposite {
 	labelDiagnose.setText(Messages.CstProfileEditor_Diagnose);
 	labelDiagnose.setSize(200, 20);
 
-	txtDiagnose = new Text(parent, SWT.MULTI);
+	txtDiagnose = new Text(parent, SWT.V_SCROLL | SWT.MULTI);
 	txtDiagnose.setData("diagnose");
 	GridData gdTextDiagnose = new GridData(GridData.FILL_HORIZONTAL);
 	gdTextDiagnose.widthHint = 600;

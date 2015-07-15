@@ -12,6 +12,7 @@ package ch.gpb.elexis.cst.widget;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -32,6 +33,7 @@ public class CstDangerRangeCanvas extends CstCanvas {
     double dRangeStart;
     double dRangeEnd;
     double dValue;
+    String alphanumValue;
     int iLenScale;
     Image marker;
     Image verlaufRl;
@@ -45,14 +47,14 @@ public class CstDangerRangeCanvas extends CstCanvas {
     String sDate;
 
     public CstDangerRangeCanvas(Composite parent, boolean a4Quer, int style, double dRangeStart, double dRangeEnd,
-	    double dValue,
-	    String title, String date) {
+	    double dValue, String sValue, String title, String date) {
 	super(parent, style);
 	this.dRangeStart = dRangeStart;
 	this.dRangeEnd = dRangeEnd;
 	this.dValue = dValue;
 	this.title = title;
 	this.sDate = date;
+	this.alphanumValue = sValue;
 
 	// 1123 - 794 = 329
 	if (a4Quer) {
@@ -107,7 +109,7 @@ public class CstDangerRangeCanvas extends CstCanvas {
 	//System.out.println("dAnzeigeBereich : " + dAnzeigeBereich);
 
 	// compute a factor for the x-offset
-	double fac = iPixLen / dAnzeigeBereich;
+	double xFac = iPixLen / dAnzeigeBereich;
 	//System.out.println("val: " + dValue);
 	//System.out.println("fac: " + fac);
 
@@ -116,9 +118,9 @@ public class CstDangerRangeCanvas extends CstCanvas {
 	int greenStart = 0;
 	int greenEnd = 0;
 	if (dRangeStart > 0) {
-	    greenStart = new Double(Math.round(fac * dRangeStart)).intValue();
+	    greenStart = new Double(Math.round(xFac * dRangeStart)).intValue();
 	}
-	greenEnd = new Double(fac * dRangeEnd).intValue();
+	greenEnd = new Double(xFac * dRangeEnd).intValue();
 
 	gc.setBackground(BRIGHTGREEN);
 	gc.fillRectangle(xoffset + greenStart, yoffset, (greenEnd - greenStart), 10);
@@ -146,7 +148,14 @@ public class CstDangerRangeCanvas extends CstCanvas {
 
 	gc.setForeground(BLACK);
 
-	gc.drawString(">" + String.valueOf(dRangeEnd), xoffset + greenEnd, yoffset - 2, true);
+	//if (!alphanumValue.matches("(?i)(.*)[neg|pos|norm](.*)")) {
+	if (!(alphanumValue.toLowerCase().indexOf("neg") > -1 ||
+		alphanumValue.toLowerCase().indexOf("norm") > -1 ||
+		alphanumValue.toLowerCase().indexOf("pos") > -1 ||
+		alphanumValue.toLowerCase().indexOf("-") > -1 || alphanumValue.toLowerCase().indexOf("+") > -1)) {
+	    gc.drawString(">" + String.valueOf(dRangeEnd), xoffset + greenEnd, yoffset - 2, true);
+
+	}
 
 	if (this.title != null) {
 	    gc.drawString(title + " (" + sDate + ")", xoffset + 2, yoffset - 13, true);
@@ -159,7 +168,7 @@ public class CstDangerRangeCanvas extends CstCanvas {
 	    gc.drawString("< " + String.valueOf(dRangeStart), xoffset + greenStart, yoffset - 2, true);
 	}
 
-	int posM = new Double(Math.round(fac * dValue)).intValue();
+	int posM = new Double(Math.round(xFac * dValue)).intValue();
 	// draw a Rect as pointer
 
 	// draw the value 
@@ -167,10 +176,40 @@ public class CstDangerRangeCanvas extends CstCanvas {
 	// TODO: compute the pixel width of the value string
 	int iLenValue = 4;
 
-	if (dValue > 0) {
-	    gc.drawString(sValue, xoffset + posM, yoffset + 14 - iLenValue, true);
-	    // draw the pointer icon
-	    gc.drawImage(pointer, xoffset + posM - 6, yoffset + 14 - iLenValue - 14);
+	//if (alphanumValue.matches("(?i)(.*)[neg|norm](.*)")) {
+	FontMetrics fm = gc.getFontMetrics();
+	Point pt = gc.textExtent(alphanumValue);
+
+	if (alphanumValue.toLowerCase().indexOf("pos") > -1 || alphanumValue.toLowerCase().indexOf("+") > -1) {
+	    String sDisplay = alphanumValue;
+	    if (sDisplay.indexOf("+") > -1) {
+		sDisplay = "positiv";
+	    }
+
+	    gc.drawString(sDisplay, iPixLen - pt.x - 20, yoffset - iLenValue + 1, true);
+	}
+	else if (alphanumValue.toLowerCase().indexOf("neg") > -1
+		|| alphanumValue.toLowerCase().indexOf("norm") > -1 || alphanumValue.toLowerCase().indexOf("-") > -1) {
+
+	    /*
+	    if (alphanumValue != null
+	    	&& (alphanumValue.toLowerCase().indexOf("pos") > -1
+	    		|| alphanumValue.toLowerCase().indexOf("neg") > -1
+	    		|| alphanumValue.toLowerCase().indexOf("norm") > -1)) {
+	        */
+	    String sDisplay = alphanumValue;
+	    if (sDisplay.indexOf("-") > -1) {
+		sDisplay = "negativ";
+	    }
+
+	    gc.drawString(sDisplay, xoffset + posM, yoffset - iLenValue + 1, true);
+
+	} else {
+	    if (dValue > 0) {
+		gc.drawString(sValue, xoffset + posM, yoffset + 14 - iLenValue, true);
+		// draw the pointer icon
+		gc.drawImage(pointer, xoffset + posM - 6, yoffset + 14 - iLenValue - 14);
+	    }
 	}
 
     }

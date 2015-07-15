@@ -231,6 +231,24 @@ public class CstProfile extends PersistentObject implements Comparable<CstProfil
     }
 
     /*
+    public static CstProfile getByNameAndPatient(String name, String kontaktId) {
+    Query<CstProfile> qbe = new Query<CstProfile>(CstProfile.class);
+    qbe.add("ID", Query.NOT_EQUAL, VERSIONID); //$NON-NLS-1$
+    qbe.add("name", Query.EQUALS, name);
+    qbe.add("profileId", Query.EQUALS, profileId);
+    List<CstProfile> res = qbe.execute();
+    if (res.isEmpty()) {
+        return null;
+    } else {
+        if (res.size() > 1) {
+    	throw new IllegalArgumentException(String.format(
+    		"There is already a category of name [%s] - [%s]", name));
+        }
+        return res.get(0);
+    }
+    }*/
+
+    /*
     public static List<CstProfile> getByLabItemId(String labItemId) {
     Query<CstProfile> qbe = new Query<CstProfile>(CstProfile.class);
     qbe.add("ID", Query.NOT_EQUAL, VERSIONID);

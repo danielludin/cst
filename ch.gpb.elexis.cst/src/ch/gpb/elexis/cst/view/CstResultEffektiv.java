@@ -332,6 +332,7 @@ public class CstResultEffektiv extends CstResultPart {
 		    try {
 			if (labResultLatest != null && labResultLatest.getResult() != null) {
 			    sResult = labResultLatest.getResult();
+			    System.out.println("raw result: " + sResult);
 			}
 		    } catch (Exception e1) {
 			log.info("Error opening result view: " + e1.getMessage() + " " + labItem.getName(),
@@ -394,6 +395,7 @@ public class CstResultEffektiv extends CstResultPart {
 
 			f.setValue(dResultV);
 			f.setDateOfFinding(CstService.getDateFromCompact(fDate));
+			f.setParam(sResultV);
 			findings.add(f);
 
 		    }
@@ -422,7 +424,7 @@ public class CstResultEffektiv extends CstResultPart {
 				leftCompo,
 				profile.getAusgabeRichtung(), SWT.NONE,
 				dRangeStart,
-				dRangeEnd, dResult, labItem.getName(),
+				dRangeEnd, dResult, sResult, labItem.getName(),
 				CstService.getGermanFromCompact(sDateOfLatestLabresult));
 			GridLayout drcLayout = new GridLayout();
 			GridData drcData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);

@@ -184,6 +184,8 @@ public class Messages extends NLS {
     public static String TemplateComposite_template_settings;
     public static String TemplateComposite_template_title;
     public static String TemplateComposite_OutputHeader;
+    public static String RemindersComposite_btnNewButton_text;
+    public static String RemindersComposite_btnNewButton_text_1;
     //public static String TemplateComposite_text_text;
 
     static {

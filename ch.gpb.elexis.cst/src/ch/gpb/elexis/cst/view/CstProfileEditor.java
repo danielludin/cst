@@ -109,6 +109,7 @@ import ch.gpb.elexis.cst.view.profileeditor.DateRangeComposite;
 import ch.gpb.elexis.cst.view.profileeditor.GastroComposite;
 import ch.gpb.elexis.cst.view.profileeditor.HilfeComposite;
 import ch.gpb.elexis.cst.view.profileeditor.ProImmunComposite;
+import ch.gpb.elexis.cst.view.profileeditor.RemindersComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TemplateComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TherapieVorschlagComposite;
 
@@ -294,7 +295,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	ciTmp.setControl(aoComposite);
 
 	// Tab Auswahl Befunde
-	// names is like "Grösse (m);;BD;;Gewicht;;Röntgen;;Quick;;BZ;;EKG;;Ferinject-Dosis (Mangel in mg Eisen);;Tumormarker;;Vit B 12;;Infusion;;test"
 	BefundSelectionComposite befundSelectionComposite = new BefundSelectionComposite(ctabs);
 	CTabItem ciBsc = new CTabItem(ctabs, SWT.NONE);
 	ciBsc.setText(Messages.CstProfileEditor_Auswahlbefunde);
@@ -331,6 +331,13 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	TemplateComposite templateComposite = new TemplateComposite(ctabs);
 	ci12.setControl(templateComposite);
 
+	/*
+	// Tabitem REminders
+	CTabItem ci13 = new CTabItem(ctabs, SWT.NONE);
+	ci13.setText("Reminders");
+	RemindersComposite stateComposite = new RemindersComposite(ctabs);
+	ci13.setControl(stateComposite);
+	 */
 	// Tabitem Hilfe
 	CTabItem ci11 = new CTabItem(ctabs, SWT.NONE);
 	ci11.setText(Messages.HilfeComposite_hilfe_text);
@@ -815,6 +822,12 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		docComposite.clear();
 
 	    }
+	    if (item.getText().startsWith("Reminders")) {
+		RemindersComposite composite = (RemindersComposite) item.getControl();
+		composite.setProfile(selProfile);
+
+	    }
+
 	    if (item.getText().startsWith(Messages.TemplateComposite_template_title)) {
 		TemplateComposite templateComposite = (TemplateComposite) item.getControl();
 		templateComposite.setTemplate(selProfile.getTemplate().equals("1") ? true : false);
@@ -1344,6 +1357,17 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		// dialog.setValidTo(profile.getValidTo());
 
 		if (dialog.open() == Window.OK) {
+
+		    //CstProfile.getByNameAndPatientAndMandant(dialog.getName(), kontaktId, mandantId)
+		    CstProfile existProf = CstProfile.getByNameAndPatientAndMandant(dialog.getName(), patient.getId(),
+			    CoreHub.actMandant.getId());
+
+		    //if (existProf != null && !profile.getId().equals(existProf.getId())) {
+		    if (existProf != null) {
+
+			showMessage(Messages.Cst_Text_cstprofile_exists);
+			return;
+		    }
 		    profile.setName(dialog.getName());
 		    profile.setDescription(dialog.getDescription());
 		    profile.setValidFrom(dialog.getValidFrom());
