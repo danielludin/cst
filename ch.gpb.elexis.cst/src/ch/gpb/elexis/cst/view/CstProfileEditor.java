@@ -160,6 +160,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
     TherapieVorschlagComposite therapieComposite;
     AnzeigeOptionsComposite aoComposite;
     TemplateComposite templateComposite;
+    RemindersComposite stateComposite;
 
     //private Map<String, String> hash;
     private CTabFolder ctabs;
@@ -331,13 +332,13 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	TemplateComposite templateComposite = new TemplateComposite(ctabs);
 	ci12.setControl(templateComposite);
 
-	/*
+
 	// Tabitem REminders
 	CTabItem ci13 = new CTabItem(ctabs, SWT.NONE);
 	ci13.setText("Reminders");
-	RemindersComposite stateComposite = new RemindersComposite(ctabs);
+	stateComposite = new RemindersComposite(ctabs);
 	ci13.setControl(stateComposite);
-	 */
+
 	// Tabitem Hilfe
 	CTabItem ci11 = new CTabItem(ctabs, SWT.NONE);
 	ci11.setText(Messages.HilfeComposite_hilfe_text);
@@ -529,7 +530,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			selProfile.setMap(CstGroup.ITEMRANKING, ranking);
 		    }
 
-
 		    loadCstProfile(selProfile);
 		    tableViewerCstGroups.refresh();
 		}
@@ -638,6 +638,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	}
 
 	CstProfile selProfile = (CstProfile) selItemC[0].getData();
+
 
 	if (selProfile.getCstGroups().size() == 0) {
 	    MessageBox dialog =
@@ -1671,6 +1672,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
     public void activation(boolean mode) {
 	// TODO Auto-generated method stub
 
+
     }
 
     @Override
@@ -1679,11 +1681,19 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 	    eeli_pat.catchElexisEvent(new ElexisEvent(ElexisEventDispatcher.getSelectedPatient(), null,
 		    ElexisEvent.EVENT_SELECTED));
+
+	    //stateComposite.add
+	    CoreHub.heart.addListener(stateComposite);
+	    //System.out.println("Hearbeat Listener added");
+	    stateComposite.heartbeat();
+
 	} else {
 	    ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
+	    CoreHub.heart.removeListener(stateComposite);
+	    //System.out.println("Hearbeat Listener removed");
+
 	}
 
     }
-
 
 }

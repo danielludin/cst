@@ -11,6 +11,8 @@
 package ch.gpb.elexis.cst.view.profileeditor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,16 +21,24 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -40,42 +50,51 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.events.Heartbeat.HeartListener;
+import ch.elexis.core.ui.UiDesk;
+import ch.gpb.elexis.cst.Activator;
 import ch.gpb.elexis.cst.data.CstProfile;
 import ch.gpb.elexis.cst.data.CstStateItem;
+import ch.gpb.elexis.cst.data.CstStateItem.StateType;
+import ch.gpb.elexis.cst.dialog.CstReminderDialog;
 import ch.gpb.elexis.cst.preferences.Messages;
+import ch.gpb.elexis.cst.service.CstService;
 
-public class RemindersComposite extends CstComposite {
+public class RemindersComposite extends CstComposite implements HeartListener/* IActivationListener */{
 
     CstProfile aProfile;
     TreeViewer treeviewer;
     Action actionAddObject;
     Action actionDeleteObject;
+    Action actionEditObject;
+
+    Image imgExclam = UiDesk.getImage(Activator.IMG_EXCLAM_NAME);
+
+    List<Image> imageList = new ArrayList<Image>();
+
+    Label lblHeart;
+    Label lblCheckingForActions;
 
     public RemindersComposite(Composite parent) {
 	super(parent, SWT.NONE);
 
-	GridLayout gridLayout = new GridLayout(1, false);
+	GridLayout gridLayout = new GridLayout(4, false);
 	setLayout(gridLayout);
 
 	createLayout(this);
 
 	treeviewer = new TreeViewer(this, SWT.BORDER);
 	Tree tree_1 = treeviewer.getTree();
-	GridData gd_tree_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-	gd_tree_1.heightHint = 260;
-	gd_tree_1.widthHint = 360;
+	GridData gd_tree_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1);
+	gd_tree_1.heightHint = 230;
+	gd_tree_1.widthHint = 500;
 	tree_1.setLayoutData(gd_tree_1);
-	//tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 	treeviewer.setContentProvider(new ViewContentProvider());
 	treeviewer.setLabelProvider(new ViewLabelProvider());
-	//tree.setInput(File.listRoots());
-	//tree.setInput(CstStateItem.getRootItems());
-
-	// StateItems with parent = null are root objects
-	//tree.setInput(CstStateItem.getStateItems(null));
 
 	Button btnNewAction = new Button(this, SWT.NONE);
-	btnNewAction.setText("New Item");
+	btnNewAction.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+	btnNewAction.setText("Start new event chain");
 	btnNewAction.addSelectionListener(new NewItemListener());
 
 	Button btnExpandAll = new Button(this, SWT.NONE);
@@ -94,15 +113,9 @@ public class RemindersComposite extends CstComposite {
 
 		if (treeviewer.getSelection() instanceof IStructuredSelection) {
 		    IStructuredSelection selection = (IStructuredSelection) treeviewer.getSelection();
-
-		    /*
-		    DatabaseModelObject object = (DatabaseModelObject)selection.getFirstElement();
-
-		    if (object.getType() == DATABASE_OBJECT_TYPE.TABLE){
-		      manager.add(new ShowTableDataAction(SWTApp.this));
-		    }*/
 		    manager.add(actionAddObject);
 		    manager.add(actionDeleteObject);
+		    manager.add(actionEditObject);
 
 		}
 	    }
@@ -110,56 +123,128 @@ public class RemindersComposite extends CstComposite {
 
 	menuMgr.setRemoveAllWhenShown(true);
 	treeviewer.getControl().setMenu(menu);
+	treeviewer.getTree().setHeaderVisible(true);
+	ColumnViewerToolTipSupport.enableFor(treeviewer);
+
 
 	makeActions();
+
+	CoreHub.heart.addListener(this);
+	new Label(this, SWT.NONE);
+
+	lblHeart = new Label(this, SWT.NONE);
+	lblHeart.setText(Messages.RemindersComposite_lblHeart_text);
+	GridData gd_lblHeart = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+	gd_lblHeart.heightHint = 50;
+	gd_lblHeart.widthHint = 50;
+	lblHeart.setLayoutData(gd_lblHeart);
+	new Label(this, SWT.NONE);
+	new Label(this, SWT.NONE);
+	new Label(this, SWT.NONE);
+
+	lblCheckingForActions = new Label(this, SWT.NONE);
+	lblCheckingForActions.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+	lblCheckingForActions.setText(Messages.RemindersComposite_lblCheckingForActions_text);
+
+	treeviewer.addDoubleClickListener(new IDoubleClickListener() {
+	    @Override
+	    public void doubleClick(DoubleClickEvent event) {
+		TreeViewer viewer = (TreeViewer) event.getViewer();
+		IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection();
+		Object selectedNode = thisSelection.getFirstElement();
+		viewer.setExpandedState(selectedNode,
+			!viewer.getExpandedState(selectedNode));
+	    }
+	});
+
+	imageList = Arrays.asList(imgHeart1, imgHeart2, imgHeart3, imgHeartA, imgHeartB, imgHeartC, imgHeartD,
+		imgHeartE);
+
+	lblCheckingForActions.setVisible(false);
+	lblHeart.setVisible(false);
     }
 
     // dynamic Layout elements
     private void createLayout(Composite parent) {
 
 	Label labelTherapievorschlag = new Label(parent, SWT.NONE);
-	labelTherapievorschlag.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
-	labelTherapievorschlag.setText(Messages.CstProfileEditor_Therapievorschlag);
+	labelTherapievorschlag.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 4, 1));
+	labelTherapievorschlag.setText(Messages.RemindersComposite_title_reminder);
 	labelTherapievorschlag.setSize(200, 20);
+
+    }
+
+    @Override
+    public void dispose() {
+	super.dispose();
+    }
+
+    /**
+     * checking for actions coming due
+     * Adding the Hearbeat Listener is done by activation of CstProfileEditor,
+     * even when there is no profile selected yet. thus the return statement.
+     */
+    @Override
+    public void heartbeat() {
+	System.out.println("HEARTBEAT");
+
+	if (aProfile == null) {
+	    return;
+	}
+	new HeartbeatThread().start();
+	//UiDesk.asyncExec(new HeartbeatThread());
 
     }
 
     class NewItemListener extends SelectionAdapter {
 	@Override
 	public void widgetSelected(final SelectionEvent e) {
-	    //CstStateItem selItem = (CstStateItem) e.getSource();
-	    //addObject(selItem);
 	    addObject(null);
-
 	    treeviewer.setInput(CstStateItem.getRootItems(aProfile));
-
-	    treeviewer.refresh();
 	}
     }
 
     class ExpandAllListener extends SelectionAdapter {
 	@Override
 	public void widgetSelected(final SelectionEvent e) {
-	    //CstStateItem selItem = (CstStateItem) e.getSource();
-	    //addObject(selItem);
 	    expandAll();
 	}
     }
 
+    private void showMessage(String title, String msg) {
+	MessageDialog.openInformation(UiDesk.getTopShell(), title, msg);
+    }
+
     public void addObject(CstStateItem selItem) {
+
+	if (aProfile == null) {
+	    showMessage("No Profile", "Bitte wählen Sie ein Profil");
+	    return;
+	}
+	CstReminderDialog dialog = new CstReminderDialog(getShell(), CoreHub.actMandant);
+
+	StateType selType = null;
+	String name = null;
+	dialog.create();
+	if (dialog.open() == Window.OK) {
+	    selType = dialog.getItemType();
+	    name = dialog.getGroupName();
+	} else {
+	    return;
+	}
 
 	if (selItem != null) {
 
-	    CstStateItem item = new CstStateItem("ACTION", "", aProfile.getId(), selItem.getId(),
+	    CstStateItem item = new CstStateItem(CstService.getCompactFromDate(new Date()), name, selType,
+		    aProfile.getId(), selItem.getId(),
 		    CoreHub.actMandant.getId());
 	    System.out.println("created CstStateItem with parent: " + item.getId());
 	} else {
-	    CstStateItem item = new CstStateItem("ACTION", "", aProfile.getId(), null,
+	    CstStateItem item = new CstStateItem(CstService.getCompactFromDate(new Date()), name, selType,
+		    aProfile.getId(), null,
 		    CoreHub.actMandant.getId());
 	    System.out.println("created CstStateItem without parent: " + item.getId());
 	}
-	treeviewer.refresh();
-
     }
 
     private void makeActions() {
@@ -168,8 +253,11 @@ public class RemindersComposite extends CstComposite {
 		IStructuredSelection selection = (IStructuredSelection) treeviewer.getSelection();
 		System.out.println("sel tree: " + selection.toString());
 		CstStateItem selItem = (CstStateItem) selection.getFirstElement();
+
 		addObject(selItem);
-		expandAll();
+		treeviewer.refresh();
+		//expandAll();
+		treeviewer.setExpandedState(selItem, true);
 
 	    }
 	};
@@ -177,11 +265,58 @@ public class RemindersComposite extends CstComposite {
 	actionAddObject.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 		.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 
-	actionDeleteObject = new Action() {
+	actionEditObject = new Action() {
 	    public void run() {
 		IStructuredSelection selection = (IStructuredSelection) treeviewer.getSelection();
 		System.out.println("sel tree: " + selection.toString());
 		CstStateItem selItem = (CstStateItem) selection.getFirstElement();
+
+		CstReminderDialog dialog = new CstReminderDialog(getShell(), CoreHub.actMandant);
+		dialog.create();
+
+		dialog.setName(selItem.getName());
+		dialog.setDescription(selItem.getDescription());
+		dialog.setType(selItem.getItemType());
+		dialog.setDate(CstService.getDateFromCompact(selItem.getDate()));
+
+		StateType selType = null;
+		String name = null;
+		String desc = null;
+		Date date = null;
+
+		if (dialog.open() == Window.OK) {
+		    selType = dialog.getItemType();
+		    name = dialog.getGroupName();
+		    desc = dialog.getGroupDescription();
+		    date = dialog.getDate();
+
+		} else {
+		    return;
+		}
+
+		selItem.setName(name);
+		selItem.setDescription(desc);
+		selItem.setItemType(selType);
+		selItem.setDate(CstService.getCompactFromDate(date));
+
+		treeviewer.refresh();
+		//expandAll();
+
+	    }
+	};
+	actionEditObject.setText("Edit Item");
+	actionEditObject.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+		.getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT));
+
+	actionDeleteObject = new Action() {
+	    public void run() {
+		TreeSelection selection = (TreeSelection) treeviewer.getSelection();
+		System.out.println("sel tree: " + selection.toString());
+		CstStateItem selItem = (CstStateItem) selection.getFirstElement();
+		//selection.getPaths();
+		//CstStateItem parent = (CstStateItem) selItem.getParent();
+
+		//TreeItem treeItem = (TreeItem) selection.getFirstElement();
 
 		List<CstStateItem> result = new ArrayList<CstStateItem>();
 		List<CstStateItem> itemsToDelete = getChildrenToDelete(selItem, result);
@@ -192,9 +327,10 @@ public class RemindersComposite extends CstComposite {
 		}
 
 		treeviewer.setInput(CstStateItem.getRootItems(aProfile));
-		treeviewer.refresh();
-		//treeviewer.setExpandedElements(new Object[] { selItem.getParent() });
 		expandAll();
+		//
+
+		//treeviewer.setExpandedState(CstStateItem.getParent(selItem), true);
 
 	    }
 	};
@@ -205,15 +341,9 @@ public class RemindersComposite extends CstComposite {
     }
 
     private static List<CstStateItem> getChildrenToDelete(CstStateItem parent, List<CstStateItem> result) {
-	//ArrayList<CstStateItem> result = new ArrayList<CstStateItem>();
 	List<CstStateItem> items = CstStateItem.getChildren(parent);
 
 	for (CstStateItem item : items) {
-	    /*
-	     result.add(item);
-	     List<CstStateItem> children = RemindersComposite.getChildrenToDelete(item, result);
-	     result.addAll(children);
-	     */
 	    result.add(item);
 
 	    if (!CstStateItem.getChildren(item).isEmpty()) {
@@ -226,45 +356,83 @@ public class RemindersComposite extends CstComposite {
     }
 
     private void expandAll() {
-	/*
-	Tree tree = treeviewer.getTree();
-	for (TreeItem item : tree.getItems()) {
-	    item.setExpanded(true);
-	}
-	*/
 	treeviewer.expandAll();
     }
+
     class ViewLabelProvider extends StyledCellLabelProvider {
 	@Override
 	public void update(ViewerCell cell) {
-	    /*
-	    Object element = cell.getElement();
-	    StyledString text = new StyledString();
-	    File file = (File) element;
-	    if (file.isDirectory()) {
-	    text.append(getFileName(file));
-	    cell.setImage(image);
-	    String[] files = file.list();
-	    if (files != null) {
-	      text.append(" (" + files.length + ") ",
-	          StyledString.COUNTER_STYLER);
-	    }
-	    } else {
-	    text.append(getFileName(file));
-	    }
-	    cell.setText(text.toString());
-	    cell.setStyleRanges(text.getStyleRanges());
-	    super.update(cell);
-	     */
 
 	    CstStateItem element = (CstStateItem) cell.getElement();
 	    StyledString text = new StyledString();
-	    text.append(element.getId());
+	    text.append(element.getItemType().name() + ": " + element.getName());
 
 	    cell.setText(text.toString());
 	    cell.setStyleRanges(text.getStyleRanges());
+
+	    // A, D, R, T
+	    switch (element.getItemType().ordinal()) {
+	    case 0:
+		cell.setForeground(ORANGE);
+		cell.setImage(imgAction);
+		break;
+	    case 1:
+		cell.setForeground(COLOR_RED);
+		cell.setImage(imgDecision);
+		break;
+	    case 2:
+		cell.setText(element.getItemType().name() + "" + "   fällig am:"
+			+ CstService.getGermanFromCompact(element.getDate()));
+
+		if (new Date().after(CstService.getDateFromCompact(element.getDate()))) {
+		    cell.setImage(imgReminder);
+		    cell.setBackground(COLOR_RED);
+		    /*
+		    cell.setText(text.toString() + "  (fällig am: "
+		        + CstService.getGermanFromCompact(element.getDate())
+		        + ") ");
+		        */
+
+
+		} else {
+		    cell.setBackground(WHITE);
+		    cell.setImage(imgReminder);
+		}
+		cell.setForeground(VIOLET);
+
+		break;
+	    case 3:
+		cell.setForeground(GREEN);
+		cell.setImage(imgTrigger);
+		break;
+
+	    default:
+		break;
+	    }
+
 	    super.update(cell);
 
+	}
+
+	@Override
+	public String getToolTipText(Object element) {
+	    CstStateItem item = (CstStateItem) element;
+	    return "ID: " + item.getId() + " (" + CstService.getGermanFromCompact(item.getDate()) + ")";
+	}
+
+	@Override
+	public Point getToolTipShift(Object object) {
+	    return new Point(5, 5);
+	}
+
+	@Override
+	public int getToolTipTimeDisplayed(Object object) {
+	    return 2000;
+	}
+
+	@Override
+	public int getToolTipDisplayDelayTime(Object object) {
+	    return 200;
 	}
     }
 
@@ -278,11 +446,6 @@ public class RemindersComposite extends CstComposite {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-	    //return (File[]) inputElement;
-	    /*
-	    Object[] elements = (Object[]) inputElement;
-	    return elements;
-	    */
 	    LinkedList list = (LinkedList) inputElement;
 	    return list.toArray();
 	}
@@ -290,7 +453,6 @@ public class RemindersComposite extends CstComposite {
 	@Override
 	public Object[] getChildren(Object parentElement) {
 	    CstStateItem file = (CstStateItem) parentElement;
-	    //return file.listFiles();
 
 	    List children = CstStateItem.getChildren(file);
 	    return children.toArray();
@@ -299,17 +461,13 @@ public class RemindersComposite extends CstComposite {
 
 	@Override
 	public Object getParent(Object element) {
-	    /*
-	    File file = (File) element;
-	    return file.getParentFile();
-	    */
 
 	    System.out.println("getParent class: " + element.getClass());
 	    if (element instanceof LinkedList) {
 		LinkedList list = (LinkedList) element;
 		Iterator it = list.iterator();
-		if (it.hasNext()) {
 
+		if (it.hasNext()) {
 		    CstStateItem child2 = (CstStateItem) it.next();
 		    return child2;
 		} else {
@@ -325,13 +483,6 @@ public class RemindersComposite extends CstComposite {
 
 	@Override
 	public boolean hasChildren(Object element) {
-	    /*
-	      File file = (File) element;
-	      if (file.isDirectory()) {
-	    return true;
-	      }
-	      return false;
-	      */
 	    CstStateItem child = (CstStateItem) element;
 	    List<CstStateItem> children = CstStateItem.getChildren(child);
 	    return !children.isEmpty();
@@ -346,6 +497,53 @@ public class RemindersComposite extends CstComposite {
     public void setProfile(CstProfile aProfile) {
 	this.aProfile = aProfile;
 	this.treeviewer.setInput(CstStateItem.getRootItems(aProfile));
+    }
+
+    /**
+     * class to display the execution of the heart beat
+     * with a pulsating heart (what else?)
+     * @author daniel
+     *
+     */
+    public class HeartbeatThread extends Thread {
+	int pulse = 300;
+
+	public void run() {
+	    System.out.println("Hello from a thread!");
+
+	    try {
+		HeartbeatThread.sleep(1000);
+		UiDesk.asyncExec(new Runnable() {
+		    public void run() {
+			lblCheckingForActions.setVisible(true);
+			lblHeart.setVisible(true);
+		    }
+		});
+
+		for (final Image image : imageList) {
+
+		    HeartbeatThread.sleep(pulse);
+		    UiDesk.asyncExec(new Runnable() {
+			public void run() {
+			    lblHeart.setImage(image);
+			}
+		    });
+		}
+
+		UiDesk.asyncExec(new Runnable() {
+		    public void run() {
+			lblCheckingForActions.setVisible(false);
+			lblHeart.setVisible(false);
+		    }
+		});
+		HeartbeatThread.sleep(400);
+
+
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
+	    }
+	}
+
     }
 
 }

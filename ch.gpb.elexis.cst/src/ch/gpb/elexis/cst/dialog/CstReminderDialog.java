@@ -11,25 +11,30 @@
 package ch.gpb.elexis.cst.dialog;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.data.Mandant;
+import ch.gpb.elexis.cst.Activator;
 import ch.gpb.elexis.cst.data.CstProfile;
-import ch.gpb.elexis.cst.preferences.Messages;
+import ch.gpb.elexis.cst.data.CstStateItem.StateType;
+import ch.gpb.elexis.cst.widget.ImageCombo;
 
 /**
  * @author daniel ludin ludin@swissonline.ch
@@ -37,32 +42,40 @@ import ch.gpb.elexis.cst.preferences.Messages;
  * 
  */
 
-public class CstNewProfileDialog extends TitleAreaDialog {
+public class CstReminderDialog extends TitleAreaDialog {
 
     private Text txtFirstName;
     private Text lastNameText;
 
-    CstProfile selectedProfile;
+    StateType selectedType;
 
     private String groupName;
+    ImageCombo combo;
     private String groupDescription;
-    Combo combo;
     Mandant mandant;
+    CDateTime dateTime;
+    Date selDate;
 
-    HashMap hash = new HashMap();
-    ArrayList<CstProfile> options = new ArrayList();
+    ArrayList<CstProfile> options = new ArrayList<CstProfile>();
 
-    public CstNewProfileDialog(Shell parentShell, Mandant mandant) {
+    Map<Integer, Image> imageMap = new HashMap<Integer, Image>();
+
+    public CstReminderDialog(Shell parentShell, Mandant mandant) {
 	super(parentShell);
 	this.mandant = mandant;
+
+	imageMap.put(StateType.ACTION.ordinal(), UiDesk.getImage(Activator.IMG_REMINDER_ACTION_NAME));
+	imageMap.put(StateType.DECISION.ordinal(), UiDesk.getImage(Activator.IMG_REMINDER_DECISION_NAME));
+	imageMap.put(StateType.REMINDER.ordinal(), UiDesk.getImage(Activator.IMG_REMINDER_REMINDER_NAME));
+	imageMap.put(StateType.TRIGGER.ordinal(), UiDesk.getImage(Activator.IMG_REMINDER_TRIGGER_NAME));
 
     }
 
     @Override
     public void create() {
 	super.create();
-	setTitle(Messages.Cst_Text_create_cstprofile);
-	setMessage(Messages.Cst_Text_Enter_name_for_cstprofile, IMessageProvider.INFORMATION);
+	setTitle("Erzeugt neuen Reminder");
+	setMessage("Bitte wählen Sie Namen und Typ des Reminders", IMessageProvider.INFORMATION);
     }
 
     @Override
@@ -78,36 +91,29 @@ public class CstNewProfileDialog extends TitleAreaDialog {
 	createFirstName(container);
 	createLastName(container);
 
+	Label lblNewLabel_1 = new Label(container, SWT.NONE);
+	lblNewLabel_1.setText("Datum:");
+
+	dateTime = new CDateTime(container, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM | CDT.TEXT_TRAIL);
+
 	Label lblNewLabel = new Label(container, SWT.NONE);
-	lblNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-	lblNewLabel.setText(Messages.CstCategoryDialog_lblNewLabel_text);
+	lblNewLabel.setText("Typ: ");
 
-	combo = new Combo(container, SWT.NONE);
+	combo = new ImageCombo(container, SWT.NONE);
 	combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+	combo.setBackground(UiDesk.getColorFromRGB("FFFFFF"));
 
-	List<CstProfile> cstProfiles = CstProfile.getAllProfiles(mandant.getId());
-	Collections.sort(cstProfiles);
-
-	for (CstProfile cstProfile : cstProfiles) {
-
-	    if (!cstProfile.getTemplate().equals("1")) {
-		continue;
-	    }
-
-	    String line = cstProfile.getName();
-	    if (cstProfile.getDescription().length() > 0) {
-		line += " (" + cstProfile.getDescription() + ")";
-	    }
-	    combo.add(line);
-	    options.add(cstProfile);
+	StateType[] stateTypes = StateType.values();
+	for (StateType stateType : stateTypes) {
+	    combo.add(imageMap.get(stateType.ordinal()), stateType.name());
 	}
-
+	combo.select(0);
 	return area;
     }
 
     private void createFirstName(Composite container) {
 	Label lbtFirstName = new Label(container, SWT.NONE);
-	lbtFirstName.setText(Messages.CstProfile_name);
+	lbtFirstName.setText("Name: ");
 
 	GridData dataFirstName = new GridData();
 	dataFirstName.grabExcessHorizontalSpace = true;
@@ -120,7 +126,7 @@ public class CstNewProfileDialog extends TitleAreaDialog {
     private void createLastName(Composite container) {
 	Label lbtLastName = new Label(container, SWT.NONE);
 
-	lbtLastName.setText(Messages.CstCategory_description);
+	lbtLastName.setText("Beschreibung: ");
 
 	GridData dataLastName = new GridData();
 	dataLastName.grabExcessHorizontalSpace = true;
@@ -136,13 +142,14 @@ public class CstNewProfileDialog extends TitleAreaDialog {
 
     // save content of the Text fields because they get disposed
     // as soon as the Dialog closes
-    // this method seems to be a hook and is called on close
+    // this method seems to be a hook and is called on close by okPressed
     private void saveInput() {
 	groupName = txtFirstName.getText();
 	groupDescription = lastNameText.getText();
 	if (combo.getSelectionIndex() > -1) {
-	    selectedProfile = options.get(combo.getSelectionIndex());
+	    selectedType = StateType.values()[combo.getSelectionIndex()];
 	}
+	selDate = dateTime.getSelection();
     }
 
     @Override
@@ -159,7 +166,29 @@ public class CstNewProfileDialog extends TitleAreaDialog {
 	return groupDescription;
     }
 
-    public CstProfile getProfileToCopyFrom() {
-	return selectedProfile;
+    public StateType getItemType() {
+	return selectedType;
+    }
+
+    public void setName(String name) {
+	txtFirstName.setText(name);
+    }
+
+    public void setDescription(String name) {
+	lastNameText.setText(name);
+    }
+
+    public void setType(StateType type) {
+	combo.select(type.ordinal());
+    }
+
+    public void setDate(Date date) {
+	dateTime.setSelection(date);
+
+    }
+
+    public Date getDate() {
+	return selDate;
+
     }
 }

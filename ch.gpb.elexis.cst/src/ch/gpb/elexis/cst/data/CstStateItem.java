@@ -10,6 +10,7 @@
  *******************************************************************************/
 package ch.gpb.elexis.cst.data;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -18,6 +19,7 @@ import java.util.List;
  */
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Query;
+import ch.gpb.elexis.cst.service.CstService;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.VersionInfo;
 
@@ -41,10 +43,12 @@ public class CstStateItem extends PersistentObject {
 		    + "	`ID` VARCHAR(25) NOT NULL,"
 		    + "	`lastupdate` BIGINT(20) NULL DEFAULT NULL,"
 		    + "	`deleted` CHAR(1) NULL DEFAULT '0',"
+		    + "	`Date` CHAR(8) NULL DEFAULT '0',"
+		    + "	`DateCreated` CHAR(8) NULL DEFAULT '0',"
 		    + "	`ParentID` VARCHAR(25) NULL DEFAULT NULL,"
 		    + "	`ProfileID` VARCHAR(25) NULL DEFAULT NULL,"
 		    + "	`ItemType` CHAR(2) NULL DEFAULT NULL,"
-		    + "	`Name` VARCHAR(30) NULL DEFAULT NULL,"
+		    + "	`Name` VARCHAR(256) NULL DEFAULT NULL,"
 		    + "	`Description` VARCHAR(256) NULL DEFAULT NULL,"
 		    + "	`Parameter` BLOB NULL, "
 		    + "	PRIMARY KEY (`ID`)" + ")"
@@ -58,6 +62,8 @@ public class CstStateItem extends PersistentObject {
     static {
 	addMapping(TABLENAME,
 		"name=Name",
+		"date=Date",
+		"dateCreated=DateCreated",
 		"description=Description",
 		"mandantId=MandantID",
 		"parentId=ParentID",
@@ -89,8 +95,8 @@ public class CstStateItem extends PersistentObject {
 	}
     }
 
-    public enum StateTypes {
-	ACTION, DECISION, TRIGGER
+    public enum StateType {
+	ACTION, DECISION, REMINDER, TRIGGER
     };
 
     public CstStateItem() {
@@ -105,7 +111,7 @@ public class CstStateItem extends PersistentObject {
 	return new CstStateItem(id);
     }
 
-    public CstStateItem(String name, String description, String profileID, String parentID, String mandantID) {
+    public CstStateItem(String date, String name, StateType type, String profileID, String parentID, String mandantID) {
 	/*
 	CstStateItem existing = getByTypeAndProfileAndMandant(name, profileID, parentID);
 	if (existing != null) {
@@ -116,14 +122,18 @@ public class CstStateItem extends PersistentObject {
 	}*/
 
 	create(null);
+	set("date", date);
 	set("name", name);
-	set("description", description);
+	//set("description", description);
+	setInt("itemType", type.ordinal());
 	set("mandantId", mandantID);
 	set("parentId", parentID);
 	set("profileId", profileID);
+	set("dateCreated", CstService.getCompactFromDate(new Date()));
+
     }
 
-    public CstStateItem(String name, String description, String mandantID) {
+    public CstStateItem(String date, String name, StateType type, String mandantID) {
 	/*
 	CstStateItem existing = getByTypeAndMandant(name, mandantID);
 	if (existing != null) {
@@ -134,9 +144,12 @@ public class CstStateItem extends PersistentObject {
 	}
 	 */
 	create(null);
+	set("date", date);
 	set("name", name);
-	set("description", description);
+	setInt("itemType", type.ordinal());
+	//set("description", description);
 	set("mandantId", mandantID);
+	set("dateCreated", CstService.getCompactFromDate(new Date()));
     }
 
     public static CstStateItem getByTypeAndProfileAndMandant(String name, String profileId, String mandantId) {
@@ -174,17 +187,22 @@ public class CstStateItem extends PersistentObject {
 	}
     }
 
-
     /**
-     * Should only return one object!
+     * Should only return null or one object!
      * @param child
      * @return
      */
-    public static List<CstStateItem> getParent(CstStateItem child) {
+    public static CstStateItem getParent(CstStateItem child) {
 	Query<CstStateItem> qbe = new Query<CstStateItem>(CstStateItem.class);
 	qbe.add("ID", Query.NOT_EQUAL, VERSIONID);
 	qbe.add("parentId", Query.EQUALS, child.getId());
-	return qbe.execute();
+	List<CstStateItem> list = qbe.execute();
+	if (list.isEmpty()) {
+	    return null;
+	}
+	else {
+	    return list.get(0);
+	}
     }
 
     public static List<CstStateItem> getChildren(CstStateItem parent) {
@@ -204,6 +222,7 @@ public class CstStateItem extends PersistentObject {
 	qbe.add("ID", Query.NOT_EQUAL, VERSIONID);
 	qbe.add("profileId", Query.EQUALS, profile.getId());
 	qbe.add("parentId", Query.EQUALS, null);
+	qbe.orderBy(false, new String[] { "dateCreated" });
 	return qbe.execute();
     }
 
@@ -228,9 +247,6 @@ public class CstStateItem extends PersistentObject {
 	return qbe.execute();
     }
 
-
-
-
     // TODO: do a hard delete, else we clutter the table
     @Override
     public boolean delete() {
@@ -245,12 +261,34 @@ public class CstStateItem extends PersistentObject {
 
     }
 
+    public void setDate(String date) {
+	set("date", date);
+    }
+
+    public String getDate() {
+	return get("date");
+    }
+
+    public String getDateCreated() {
+	return get("dateCreated");
+    }
+
     public void setName(String name) {
 	set("name", name);
     }
 
     public String getName() {
 	return get("name");
+    }
+
+    public void setItemType(StateType name) {
+	setInt("itemType", name.ordinal());
+    }
+
+    public StateType getItemType() {
+	//get("itemType");
+	return StateType.values()[getInt("itemType")];
+
     }
 
     public void setDescription(String description) {
@@ -285,7 +323,6 @@ public class CstStateItem extends PersistentObject {
 	return get("mandantId");
     }
 
-
     @Override
     public String getLabel() {
 	// TODO Auto-generated method stub
@@ -300,6 +337,21 @@ public class CstStateItem extends PersistentObject {
     // for the View content provider
     public Object getParent() {
 	return new Object();
+    }
+
+    // this is for the tree in ReminderComposite to maintain the state of expansion
+    @Override
+    public int hashCode() {
+	return getId().hashCode();
+    }
+
+    // this is for the tree in ReminderComposite to maintain the state of expansion
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof CstStateItem == false) {
+	    return false;
+	}
+	return getId().equals(((CstStateItem) obj).getId());
     }
 
 }

@@ -276,6 +276,7 @@ public class CstProfile extends PersistentObject implements Comparable<CstProfil
 	Query<CstProfile> qbe = new Query<CstProfile>(CstProfile.class);
 	qbe.add("ID", Query.NOT_EQUAL, VERSIONID);
 	qbe.add("mandantId", Query.EQUALS, mandantId);
+	qbe.orderBy(false, new String[] { "name" });
 	return qbe.execute();
     }
 

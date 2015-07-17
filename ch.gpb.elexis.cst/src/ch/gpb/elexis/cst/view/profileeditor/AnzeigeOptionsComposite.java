@@ -12,7 +12,10 @@ package ch.gpb.elexis.cst.view.profileeditor;
 
 import java.util.Calendar;
 
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -26,7 +29,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.gpb.elexis.cst.data.CstProfile;
+import ch.gpb.elexis.cst.dialog.ProfileOverview;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
 
@@ -44,6 +49,7 @@ public class AnzeigeOptionsComposite extends CstComposite {
 
     private DateRangeComposite dateRangeComposite;
     private Group grpAusrichtung;
+    private Label lblShowProfiles;
 
     public AnzeigeOptionsComposite(Composite parent) {
 	super(parent, SWT.NONE);
@@ -52,6 +58,58 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	setLayout(gridLayout);
 
 	createLayout(this);
+	//new Label(this, SWT.NONE);
+
+	lblShowProfiles = new Label(this, SWT.NONE);
+	lblShowProfiles.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+	lblShowProfiles.addMouseListener(new MouseAdapter() {
+	    @Override
+	    public void mouseDown(MouseEvent e) {
+		/*
+		MessageDialog.openInformation(UiDesk.getTopShell(), "Profil-Liste",
+			"Welche Profile sind bei welchem Patienten");
+		
+		*/
+
+		ProfileOverview dialog = new ProfileOverview(UiDesk.getTopShell());
+		dialog.create();
+
+		if (dialog.open() == Window.OK) {
+
+		} else {
+		    return;
+		}
+
+		/*
+				InputDialog dialog = new InputDialog(UiDesk.getTopShell());
+				dialog.open();
+				*/
+		/*
+		
+		dialog.create();
+
+		if (dialog.open() == Window.OK) {
+
+		} else {
+		    return;
+		}*/
+	    }
+	});
+	//final Cursor cursor = new Cursor(Display.getDefault(), SWT.CURSOR_HAND);
+
+	lblShowProfiles.setText(Messages.AnzeigeOptionsComposite_lblWoSindMeine_text);
+	lblShowProfiles.setForeground(COLOR_RED);
+	/*
+	lblShowProfiles.addListener(SWT.Selection, new Listener() {
+
+	    public void handleEvent(Event e) {
+		lblShowProfiles.setCursor(cursor);
+	    }
+	});*/
+	new Label(this, SWT.NONE);
+	new Label(this, SWT.NONE);
+	new Label(this, SWT.NONE);
+	new Label(this, SWT.NONE);
 
     }
 
@@ -143,8 +201,6 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	lblCrawlbackDate.setLayoutData(gdLblCrawlDate);
 	lblCrawlbackDate.setText("Datum");
 
-
-
 	sldCrawlback.addSelectionListener(new SelectionAdapter() {
 	    public void widgetSelected(SelectionEvent e) {
 		txtCrawlback.setText(new Integer(sldCrawlback.getSelection()).toString());
@@ -153,7 +209,6 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	    }
 	});
 	new Label(this, SWT.NONE);
-
 
 	Label lblPlausiCheck = new Label(anzeigeCanvas, SWT.NONE);
 	lblPlausiCheck.setSize(300, 20);
@@ -171,6 +226,7 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	gdBtnPlausiCheck.horizontalSpan = 2;
 	btnPlausiCheck.setVisible(false);
 	lblPlausiCheck.setVisible(false);
+	new Label(this, SWT.NONE);
 
 	dateRangeComposite = new DateRangeComposite(anzeigeCanvas, SWT.NONE);
 	GridData gdDateRange = new GridData();
@@ -213,7 +269,6 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	dateRangeComposite.setDateStartPeriod3(CstService.getDateByAddingDays(c.getTime(), -1095));
 
     }
-
 
     public int getCrawlback() {
 	return crawlback;

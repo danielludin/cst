@@ -41,6 +41,46 @@ public class Activator extends AbstractUIPlugin {
     public static final String IMG_CSTGROUP_PATH = "icons/icon-cat-1-16.png";
     public static final String IMG_CSTPROFILE_NAME = "icon-cat-2-16.png";
     public static final String IMG_CSTPROFILE_PATH = "icons/icon-cat-2-16.png";
+
+    public static final String IMG_REMINDER_ACTION_NAME = "reminder_action.png";
+    public static final String IMG_REMINDER_ACTION_PATH = "icons/reminder_action.png";
+
+    public static final String IMG_REMINDER_DECISION_NAME = "reminder_decision.png";
+    public static final String IMG_REMINDER_DECISION_PATH = "icons/reminder_decision.png";
+
+    public static final String IMG_REMINDER_TRIGGER_NAME = "reminder_trigger.png";
+    public static final String IMG_REMINDER_TRIGGER_PATH = "icons/reminder_trigger.png";
+
+    public static final String IMG_REMINDER_REMINDER_NAME = "reminder_reminder.png";
+    public static final String IMG_REMINDER_REMINDER_PATH = "icons/reminder_reminder.png";
+
+    public static final String IMG_HEART_1_NAME = "heart-icon-sm-1.png";
+    public static final String IMG_HEART_1_PATH = "icons/heart-icon-sm-1.png";
+
+    public static final String IMG_HEART_2_NAME = "heart-icon-sm-2.png";
+    public static final String IMG_HEART_2_PATH = "icons/heart-icon-sm-2.png";
+
+    public static final String IMG_HEART_3_NAME = "heart-icon-sm-3.png";
+    public static final String IMG_HEART_3_PATH = "icons/heart-icon-sm-3.png";
+
+    public static final String IMG_HEART_A_NAME = "heart-icon-sm-a.png";
+    public static final String IMG_HEART_A_PATH = "icons/heart-icon-sm-a.png";
+
+    public static final String IMG_HEART_B_NAME = "heart-icon-sm-b.png";
+    public static final String IMG_HEART_B_PATH = "icons/heart-icon-sm-b.png";
+
+    public static final String IMG_HEART_C_NAME = "heart-icon-sm-c.png";
+    public static final String IMG_HEART_C_PATH = "icons/heart-icon-sm-c.png";
+
+    public static final String IMG_HEART_D_NAME = "heart-icon-sm-d.png";
+    public static final String IMG_HEART_D_PATH = "icons/heart-icon-sm-d.png";
+
+    public static final String IMG_HEART_E_NAME = "heart-icon-sm-e.png";
+    public static final String IMG_HEART_E_PATH = "icons/heart-icon-sm-e.png";
+
+    public static final String IMG_EXCLAM_NAME = "bell-exclamation.png";
+    public static final String IMG_EXCLAM_PATH = "icons/bell-exclamation.png";
+
     // The plug-in ID png-icon-32
     public static final String PLUGIN_ID = "ch.gpb.elexis.cst"; //$NON-NLS-1$
 
@@ -68,6 +108,23 @@ public class Activator extends AbstractUIPlugin {
 	UiDesk.getImageRegistry().put(IMG_PNG_NAME, Activator.getImageDescriptor(IMG_PNG_PATH));
 	UiDesk.getImageRegistry().put(IMG_LINE_NAME, Activator.getImageDescriptor(IMG_LINE_PATH));
 	UiDesk.getImageRegistry().put(IMG_POINTER_NAME, Activator.getImageDescriptor(IMG_POINTER_PATH));
+	UiDesk.getImageRegistry().put(IMG_REMINDER_ACTION_NAME, Activator.getImageDescriptor(IMG_REMINDER_ACTION_PATH));
+	UiDesk.getImageRegistry().put(IMG_REMINDER_DECISION_NAME,
+		Activator.getImageDescriptor(IMG_REMINDER_DECISION_PATH));
+	UiDesk.getImageRegistry().put(IMG_REMINDER_TRIGGER_NAME,
+		Activator.getImageDescriptor(IMG_REMINDER_TRIGGER_PATH));
+	UiDesk.getImageRegistry().put(IMG_REMINDER_REMINDER_NAME,
+		Activator.getImageDescriptor(IMG_REMINDER_REMINDER_PATH));
+
+	UiDesk.getImageRegistry().put(IMG_HEART_1_NAME, Activator.getImageDescriptor(IMG_HEART_1_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_2_NAME, Activator.getImageDescriptor(IMG_HEART_2_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_3_NAME, Activator.getImageDescriptor(IMG_HEART_3_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_A_NAME, Activator.getImageDescriptor(IMG_HEART_A_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_B_NAME, Activator.getImageDescriptor(IMG_HEART_B_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_C_NAME, Activator.getImageDescriptor(IMG_HEART_C_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_D_NAME, Activator.getImageDescriptor(IMG_HEART_D_PATH));
+	UiDesk.getImageRegistry().put(IMG_HEART_E_NAME, Activator.getImageDescriptor(IMG_HEART_E_PATH));
+	UiDesk.getImageRegistry().put(IMG_EXCLAM_NAME, Activator.getImageDescriptor(IMG_EXCLAM_PATH));
     }
 
     /*
