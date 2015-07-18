@@ -58,19 +58,12 @@ public class AnzeigeOptionsComposite extends CstComposite {
 	setLayout(gridLayout);
 
 	createLayout(this);
-	//new Label(this, SWT.NONE);
 
 	lblShowProfiles = new Label(this, SWT.NONE);
 	lblShowProfiles.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 	lblShowProfiles.addMouseListener(new MouseAdapter() {
 	    @Override
 	    public void mouseDown(MouseEvent e) {
-		/*
-		MessageDialog.openInformation(UiDesk.getTopShell(), "Profil-Liste",
-			"Welche Profile sind bei welchem Patienten");
-		
-		*/
-
 		ProfileOverview dialog = new ProfileOverview(UiDesk.getTopShell());
 		dialog.create();
 
@@ -79,33 +72,12 @@ public class AnzeigeOptionsComposite extends CstComposite {
 		} else {
 		    return;
 		}
-
-		/*
-				InputDialog dialog = new InputDialog(UiDesk.getTopShell());
-				dialog.open();
-				*/
-		/*
-		
-		dialog.create();
-
-		if (dialog.open() == Window.OK) {
-
-		} else {
-		    return;
-		}*/
 	    }
 	});
-	//final Cursor cursor = new Cursor(Display.getDefault(), SWT.CURSOR_HAND);
 
 	lblShowProfiles.setText(Messages.AnzeigeOptionsComposite_lblWoSindMeine_text);
 	lblShowProfiles.setForeground(COLOR_RED);
-	/*
-	lblShowProfiles.addListener(SWT.Selection, new Listener() {
 
-	    public void handleEvent(Event e) {
-		lblShowProfiles.setCursor(cursor);
-	    }
-	});*/
 	new Label(this, SWT.NONE);
 	new Label(this, SWT.NONE);
 	new Label(this, SWT.NONE);

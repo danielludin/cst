@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -36,7 +35,7 @@ import ch.elexis.data.Kontakt;
 import ch.gpb.elexis.cst.data.CstProfile;
 
 public class ProfileOverview extends StatusDialog {
-    List list;
+    //List list;
     private Table table;
     java.util.List<CstProfile> profiles;
     private int sortColumn = 0;
@@ -52,8 +51,6 @@ public class ProfileOverview extends StatusDialog {
 
     @Override
     protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
-	// TODO Auto-generated method stub
-	//return super.createButton(parent, id, label, defaultButton);
 	if (id == IDialogConstants.CANCEL_ID)
 	    return null;
 	return super.createButton(parent, id, label, defaultButton);
@@ -69,17 +66,6 @@ public class ProfileOverview extends StatusDialog {
 	Label lblNewLabel = new Label(base, SWT.NONE);
 	lblNewLabel.setText("Welches Profil ist bei welchem Patienten?");
 
-	/*
-	Composite composite = new Composite(base, SWT.NONE);
-	GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-	gd_composite.heightHint = 250;
-	gd_composite.widthHint = 300;
-	gd_composite.minimumHeight = 250;
-	gd_composite.minimumWidth = 300;
-	composite.setLayoutData(gd_composite);
-	//composite.setLayout(new TableColumnLayout());
-	 */
-
 	tableViewer = new TableViewer(base, SWT.BORDER | SWT.FULL_SELECTION);
 	table = tableViewer.getTable();
 	GridData gd_table = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
@@ -89,20 +75,11 @@ public class ProfileOverview extends StatusDialog {
 	table.setHeaderVisible(true);
 	table.setLinesVisible(true);
 
-	/*
-	list = new List(base, SWT.BORDER | SWT.V_SCROLL);
-	GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
-	gd_list.minimumHeight = 200;
-	gd_list.minimumWidth = 400;
-	list.setLayoutData(gd_list);
-	 */
-
 	java.util.List<CstProfile> p = CstProfile.getAllProfiles(CoreHub.actMandant.getId());
 
 	for (CstProfile cstProfile : p) {
 	    Kontakt k = Kontakt.load(cstProfile.getKontaktId());
 
-	    //list.add(cstProfile.getName() + "  (" + cstProfile.getDescription() + ") " + k.getLabel());
 	    String[] sProf = new String[4];
 	    sProf[0] = cstProfile.getName();
 	    sProf[1] = k.getLabel();
@@ -111,9 +88,6 @@ public class ProfileOverview extends StatusDialog {
 	    lProf.add(sProf);
 
 	}
-	/*
-		java.util.List<CstProfile> 
-	*/
 	profiles = CstProfile.getAllProfiles(CoreHub.actMandant.getId());
 	String[] colLabels = getColumnLabels();
 	int columnWidth[] = getColumnWidth();
@@ -190,7 +164,7 @@ public class ProfileOverview extends StatusDialog {
 	}
 
 	public Font getFont(Object element, int columnIndex) {
-	    Font fontNormal = UiDesk.getFont("Helvetica", 7, SWT.NORMAL); //$NON-NLS-1$
+	    Font fontNormal = UiDesk.getFont("Helvetica", 8, SWT.NORMAL); //$NON-NLS-1$
 	    return fontNormal;
 	}
 
@@ -203,7 +177,7 @@ public class ProfileOverview extends StatusDialog {
 	public Color getBackground(Object element) {
 	    String[] tableLine = (String[]) element;
 	    if (tableLine[2].equals("1")) {
-		return UiDesk.getColorFromRGB("FF8888");
+		return UiDesk.getColorFromRGB("FF1188");
 	    }
 
 	    return null;

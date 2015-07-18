@@ -186,7 +186,7 @@ public class RemindersComposite extends CstComposite implements HeartListener/* 
      */
     @Override
     public void heartbeat() {
-	System.out.println("HEARTBEAT");
+	//System.out.println("HEARTBEAT");
 
 	if (aProfile == null) {
 	    return;
@@ -446,7 +446,7 @@ public class RemindersComposite extends CstComposite implements HeartListener/* 
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-	    LinkedList list = (LinkedList) inputElement;
+	    LinkedList<CstStateItem> list = (LinkedList<CstStateItem>) inputElement;
 	    return list.toArray();
 	}
 
@@ -454,7 +454,7 @@ public class RemindersComposite extends CstComposite implements HeartListener/* 
 	public Object[] getChildren(Object parentElement) {
 	    CstStateItem file = (CstStateItem) parentElement;
 
-	    List children = CstStateItem.getChildren(file);
+	    List<CstStateItem> children = CstStateItem.getChildren(file);
 	    return children.toArray();
 
 	}
@@ -464,11 +464,11 @@ public class RemindersComposite extends CstComposite implements HeartListener/* 
 
 	    System.out.println("getParent class: " + element.getClass());
 	    if (element instanceof LinkedList) {
-		LinkedList list = (LinkedList) element;
-		Iterator it = list.iterator();
+		LinkedList<CstStateItem> list = (LinkedList<CstStateItem>) element;
+		Iterator<CstStateItem> it = list.iterator();
 
 		if (it.hasNext()) {
-		    CstStateItem child2 = (CstStateItem) it.next();
+		    CstStateItem child2 = it.next();
 		    return child2;
 		} else {
 		    return null;
@@ -509,7 +509,6 @@ public class RemindersComposite extends CstComposite implements HeartListener/* 
 	int pulse = 300;
 
 	public void run() {
-	    System.out.println("Hello from a thread!");
 
 	    try {
 		HeartbeatThread.sleep(1000);

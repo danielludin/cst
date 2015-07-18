@@ -12,6 +12,7 @@ package ch.gpb.elexis.cst.view;
 
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.befunde.Messwert;
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventListener;
 import ch.elexis.core.ui.UiDesk;
@@ -79,6 +81,7 @@ import ch.gpb.elexis.cst.data.CstProimmun;
 import ch.gpb.elexis.cst.data.ValuePairTimeline;
 import ch.gpb.elexis.cst.data.ValueSingleTimeline;
 import ch.gpb.elexis.cst.dialog.PdfOptionsDialog;
+import ch.gpb.elexis.cst.preferences.CstPreference;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
 import ch.gpb.elexis.cst.util.ImageUtils;
@@ -177,7 +180,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	GRAY = UiDesk.getColorFromRGB("888888");
 	LIGHTGRAY = UiDesk.getColorFromRGB("DDDDDD");
 	;
-
 
     }
 
@@ -345,6 +347,7 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		+ Messages.CstProfileEditor_Crawlback + " " + aProfile.getCrawlBack() + ")";
 	return title;
     }
+
     protected void addLine(Composite comp, int indent) {
 	//baseComposite.pack();
 	comp.pack();
@@ -723,25 +726,36 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 	actionScreenshot = new Action() {
 	    public void run() {
-     if (profile == null) {
-       SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
-       return;
-     }
+		if (profile == null) {
+		    SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
+		    return;
+		}
 
 		GC gc = null;
 		Image image = null;
 		try {
 
+		    String latestPath = CoreHub.userCfg.get(CstPreference.CST_IDENTIFIER_LATESTPATH, null);
+		    if (latestPath == null) {
+			latestPath = System.getProperty("user.home");
+		    }
+
 		    FileDialog fd = new FileDialog(baseComposite.getShell(), SWT.SAVE);
 		    fd.setText("Save");
-		    fd.setFilterPath(System.getProperty("user.home"));
+		    fd.setFilterPath(latestPath);
 		    String[] filterExt = { "*.png", "*.*" };
 		    fd.setFilterExtensions(filterExt);
+		    fd.setFileName(CstService.generateFilename(patient));
 		    String selected = fd.open();
 
 		    if (selected == null) {
 			return;
 		    }
+
+		    File selFile = new File(selected);
+
+		    CoreHub.userCfg.set(CstPreference.CST_IDENTIFIER_LATESTPATH, selFile.getParentFile()
+			    .getAbsolutePath());
 
 		    //if (profile.getAnzeigeTyp().toLowerCase().equals("effektiv")) {
 		    if (profile.getAnzeigeTyp().toLowerCase().equals(CstProfile.ANZEIGETYP_EFFEKTIV)) {
@@ -772,8 +786,12 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		    log.error("Error saving png: " + e.toString());
 		    showMessage("Error while saving PNG", e.getMessage());
 		} finally {
-		    image.dispose();
-		    gc.dispose();
+		    if (image != null) {
+			image.dispose();
+		    }
+		    if (gc != null) {
+			gc.dispose();
+		    }
 		}
 
 	    }
@@ -789,25 +807,34 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	    public void run() {
 
 		//////////////////////////
-     if (profile == null) {
-       SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
-       return;
-     }
+		if (profile == null) {
+		    SWTHelper.alert("No profile", "Ohne Profil kann kein Resultat erzeugt werden");
+		    return;
+		}
 
 		GC gc = null;
 		Image image = null;
 		try {
+		    String latestPath = CoreHub.userCfg.get(CstPreference.CST_IDENTIFIER_LATESTPATH, null);
+		    if (latestPath == null) {
+			latestPath = System.getProperty("user.home");
+		    }
 
 		    FileDialog fd = new FileDialog(baseComposite.getShell(), SWT.SAVE);
 		    fd.setText("Save");
-		    fd.setFilterPath(System.getProperty("user.home"));
+		    fd.setFilterPath(latestPath);
 		    String[] filterExt = { "*.pdf", "*.*" };
 		    fd.setFilterExtensions(filterExt);
+		    fd.setFileName(CstService.generateFilename(patient));
 		    String selected = fd.open();
 
 		    if (selected == null) {
 			return;
 		    }
+		    File selFile = new File(selected);
+
+		    CoreHub.userCfg.set(CstPreference.CST_IDENTIFIER_LATESTPATH, selFile.getParentFile()
+			    .getAbsolutePath());
 
 		    int printHeigth = 1123;
 		    int printWidth = 794;
@@ -839,7 +866,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 			sTitle = "No header configured!";
 		    }
 		    sTitle = sTitle + " Datum: " + CstService.getReadableDateAndTime();
-
 
 		    // get option (paging to A4/ in one piece)
 		    int pdfOutputOption = 0;
@@ -981,7 +1007,6 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 					- document.rightMargin();
 				float imgHeigth = itextImage.getHeight() * 0.75f;
 
-
 				itextImage2.setAbsolutePosition(30, 20);
 				int scale = 66;
 				itextImage2.scalePercent(scale);
@@ -1004,14 +1029,16 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 		    }
 
 		} finally {
-      if (image != null) {
-        image.dispose();
-      }
-      if (gc != null) {
-        gc.dispose();
-      }
+		    if (image != null) {
+			image.dispose();
+		    }
+		    if (gc != null) {
+			gc.dispose();
+		    }
+		    /*
 		    image.dispose();
 		    gc.dispose();
+		    */
 		}
 
 	    }

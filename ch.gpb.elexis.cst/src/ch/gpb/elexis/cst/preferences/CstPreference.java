@@ -17,6 +17,9 @@ package ch.gpb.elexis.cst.preferences;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -29,6 +32,9 @@ import ch.elexis.data.Anwender;
 public class CstPreference extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
     public static String CST_IDENTIFIER_OMNIVORE = "ch.gpb.elexis.ident.omnivore";
     public static String CST_IDENTIFIER_BRIEFE = "ch.gpb.elexis.ident.briefe";
+    public static String CST_IDENTIFIER_LATESTPATH = "ch.gpb.elexis.ident.latestpath";
+    public static String CST_IDENTIFIER_FILEPREFIX = "ch.gpb.elexis.ident.fileprefix";
+    public static String CST_IDENTIFIER_FILEFORMAT = "ch.gpb.elexis.ident.fileformat";
 
     public CstPreference() {
 	super(Messages.Cst_Preference_Einstellungen, GRID);
@@ -46,12 +52,41 @@ public class CstPreference extends FieldEditorPreferencePage implements IWorkben
 	    CoreHub.userCfg.set(CST_IDENTIFIER_BRIEFE, getDefaultIdentifierBriefe());
 	}
 
+	if (CoreHub.userCfg.get(CST_IDENTIFIER_FILEPREFIX, "notset").equals("notset")) {
+	    CoreHub.userCfg.set(CST_IDENTIFIER_FILEPREFIX, getDefaultFilePrefix());
+	}
+	if (CoreHub.userCfg.get(CST_IDENTIFIER_FILEFORMAT, "notset").equals("notset")) {
+	    CoreHub.userCfg.set(CST_IDENTIFIER_FILEFORMAT, getDefaultFileFormat());
+	}
+
     }
 
     @Override
     protected void createFieldEditors() {
-	addField(new StringFieldEditor(CST_IDENTIFIER_OMNIVORE, "Cst Omnivore Documents", getFieldEditorParent()));
-	addField(new StringFieldEditor(CST_IDENTIFIER_BRIEFE, "Cst Briefe", getFieldEditorParent()));
+
+	//Composite parent = getFieldEditorParent();
+
+	Label lblDoc = new Label(getFieldEditorParent(), SWT.NONE);
+	lblDoc.setText("Anzeigekriterien für CST-bezogene Dokumente:");
+	GridData gdDoc = new GridData();
+	gdDoc.horizontalSpan = 2;
+	lblDoc.setLayoutData(gdDoc);
+
+	addField(new StringFieldEditor(CST_IDENTIFIER_OMNIVORE, "Omnivore Document Kategorie",
+		getFieldEditorParent()));
+	addField(new StringFieldEditor(CST_IDENTIFIER_BRIEFE, "Briefe (Suchkriterium Betreff)",
+		getFieldEditorParent()));
+
+	Label lblFile = new Label(getFieldEditorParent(), SWT.NONE);
+	lblFile.setText("File Export Einstellungen:");
+	GridData gdFile = new GridData();
+	gdFile.horizontalSpan = 2;
+	gdFile.verticalIndent = 30;
+	lblFile.setLayoutData(gdFile);
+
+	addField(new StringFieldEditor(CST_IDENTIFIER_FILEPREFIX, "Prefix für File-Namen", getFieldEditorParent()));
+	addField(new StringFieldEditor(CST_IDENTIFIER_FILEFORMAT, "Datumsformat für File-Namen (kein : verwenden!)",
+		getFieldEditorParent()));
     }
 
     public void init(IWorkbench workbench) {
@@ -75,6 +110,14 @@ public class CstPreference extends FieldEditorPreferencePage implements IWorkben
 
     public static String getDefaultIdentifierBriefe() {
 	return "CST";
+    }
+
+    public static String getDefaultFilePrefix() {
+	return "cst";
+    }
+
+    public static String getDefaultFileFormat() {
+	return "yyyyMMdd_HH-mm-ss";
     }
 
 }
