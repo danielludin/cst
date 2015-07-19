@@ -57,7 +57,7 @@ public class CstCanvas extends Canvas {
 	fontA = new Font(getDisplay(), fontData);
 	BLUE = UiDesk.getColorFromRGB("1E1EFF");
 	GRAY = UiDesk.getColorFromRGB("DDDDDD");
-	DARKGRAY = UiDesk.getColorFromRGB("AAAAAA");
+	DARKGRAY = UiDesk.getColorFromRGB("777777");
 	WHITE = UiDesk.getColorFromRGB("FFFFFF");
 	BRIGHTGREEN = UiDesk.getColorFromRGB("68FF00");
 	ORANGE = UiDesk.getColorFromRGB("FF6800");

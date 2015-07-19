@@ -68,6 +68,7 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.LabItem;
 import ch.elexis.data.Patient;
@@ -1051,6 +1052,79 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	 * .getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 	 */
 	actionPdf.setImageDescriptor(Activator.getImageDescriptor(Activator.IMG_PDF_PATH));
+
+    }
+
+    protected double[] extractRefValues(LabItem labItem) {
+	double[] result = new double[2];
+
+	String sRangeStart = "0";
+
+	if (patient.getGeschlecht().toLowerCase().equals("m")) {
+
+	    if (labItem.getRefM() != null) {
+		sRangeStart = labItem.getRefM();
+	    } else {
+		if (labItem.getRefW() != null) {
+		    sRangeStart = labItem.getRefW();
+		}
+	    }
+
+	} else {
+	    if (labItem.getRefW() != null) {
+		sRangeStart = labItem.getRefW();
+	    } else {
+		if (labItem.getRefM() != null) {
+		    sRangeStart = labItem.getRefM();
+		}
+	    }
+	}
+
+	sRangeStart = sRangeStart.trim();
+	double dRangeStart = 0;
+	double dRangeEnd = 0;
+
+	try {
+	    if (sRangeStart.startsWith("-")) {
+		sRangeStart = sRangeStart.replace("-", "");
+		dRangeEnd = Double.parseDouble(sRangeStart);
+		dRangeStart = 0;
+	    } else if (sRangeStart.startsWith("<")) {
+		sRangeStart = sRangeStart.replace("<", "");
+		dRangeEnd = Double.parseDouble(sRangeStart);
+		dRangeStart = 0;
+
+	    } else if (sRangeStart.startsWith(">")) {
+		sRangeStart = sRangeStart.replace(">", "");
+		dRangeStart = Double.parseDouble(sRangeStart);
+		dRangeEnd = 0;
+
+	    } // if there is only a single number, it's probably the End of range value.
+	    else if (sRangeStart.matches("\\d*")) {
+		dRangeEnd = Double.parseDouble(sRangeStart);
+		dRangeStart = 0;
+
+	    } else {
+		String[] values = sRangeStart.split("-");
+		dRangeStart = Double.parseDouble(values[0]);
+		dRangeEnd = Double.parseDouble(values[1]);
+
+	    }
+	} catch (NumberFormatException e) {
+	    log.error("NumberFormatException for start range of  Pat ID:"/* + aProfile.getKontaktId()*/
+		    + ":" + labItem.getName() + ":" + "/" + sRangeStart + e.getMessage(), Log.ERRORS);
+	} catch (ArrayIndexOutOfBoundsException e) {
+	    log.error("ArrayIndexOutOfBoundsException for start range of " + labItem.getName() + ":"
+		    + "/" + sRangeStart + e.getMessage(), Log.ERRORS);
+	}
+
+	log.debug("Formatting Reference Values of Labitem: " + labItem.getName() + ":\t" + sRangeStart
+		+ " => " + dRangeStart + "/" + dRangeEnd);
+
+	result[0] = dRangeStart;
+	result[1] = dRangeEnd;
+
+	return result;
 
     }
 

@@ -23,6 +23,10 @@ import ch.gpb.elexis.cst.service.CstService;
 
 public class MinimaxValue {
 
+    double dRangeStart;
+    double dRangeEnd;
+    String sAbstract;
+
     private Date sDateStartOfSpan1;
     private Date sDateEndOfSpan1;
 
@@ -41,11 +45,17 @@ public class MinimaxValue {
 
     private String name = "no name set";
 
-    public MinimaxValue(Date sDateStartOfSpan1, Date sDateEndOfSpan1, double dMaxOfSpan1, double dMinOfSpan1,
+    public MinimaxValue(double dRangeStart, double dRangeEnd, String sAbstract, Date sDateStartOfSpan1,
+	    Date sDateEndOfSpan1,
+	    double dMaxOfSpan1, double dMinOfSpan1,
 	    Date sDateStartOfSpan2, Date sDateEndOfSpan2,
 	    double dMaxOfSpan2, double dMinOfSpan2, Date sDateStartOfSpan3, Date sDateEndOfSpan3, double dMinOfSpan3,
 	    double dMaxOfSpan3, String name) {
 	super();
+	this.dRangeStart = dRangeStart;
+	this.dRangeEnd = dRangeEnd;
+	this.sAbstract = sAbstract;
+
 	this.sDateStartOfSpan1 = sDateStartOfSpan1;
 	this.sDateEndOfSpan1 = sDateEndOfSpan1;
 	this.dMaxOfSpan1 = dMaxOfSpan1;
@@ -180,6 +190,30 @@ public class MinimaxValue {
 
 	return result.toString();
 
+    }
+
+    public double getRangeStart() {
+	return dRangeStart;
+    }
+
+    public void setRangeStart(double dRangeStart) {
+	this.dRangeStart = dRangeStart;
+    }
+
+    public double getRangeEnd() {
+	return dRangeEnd;
+    }
+
+    public void setRangeEnd(double dRangeEnd) {
+	this.dRangeEnd = dRangeEnd;
+    }
+
+    public String getAbstract() {
+	return sAbstract;
+    }
+
+    public void setAbstract(String sAbstract) {
+	this.sAbstract = sAbstract;
     }
 
 }

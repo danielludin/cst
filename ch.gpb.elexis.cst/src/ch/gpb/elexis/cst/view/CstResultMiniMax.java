@@ -26,9 +26,11 @@ import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.LabItem;
 import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
+import ch.gpb.elexis.cst.data.CstAbstract;
 import ch.gpb.elexis.cst.data.CstGroup;
 import ch.gpb.elexis.cst.data.CstProfile;
 import ch.gpb.elexis.cst.data.MinimaxValue;
+import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
 import ch.gpb.elexis.cst.widget.MinimaxCanvas;
 
@@ -129,16 +131,28 @@ public class CstResultMiniMax extends CstResultPart {
 		    if (labItem.getEinheit().length() > 0) {
 			txL2 += " (" + labItem.getEinheit() + ")";
 
-		    }
-		    if (labItem.getKuerzel() != null) {
-			txL2 += "  " + labItem.getKuerzel();
-		    }
+		    }/*
+		     if (labItem.getKuerzel() != null) {
+		     txL2 += "  " + labItem.getKuerzel();
+		     }*/
 
 		    MinimaxValue minimaxValue = new MinimaxValue();
 		    minimaxValue.setName(
 			    group.getName() +
 				    ": " +
 				    labItem.getName() + txL2);
+
+		    CstAbstract cabstract = CstAbstract.getByLaboritemId(labItem.getId());
+		    if (cabstract != null) {
+			minimaxValue.setAbstract(cabstract.getDescription1());
+		    } else {
+			minimaxValue.setAbstract(Messages.Cst_Text_no_abstract_available);
+		    }
+
+		    double dResult[] = extractRefValues(labItem);
+
+		    minimaxValue.setRangeStart(dResult[0]);
+		    minimaxValue.setRangeEnd(dResult[1]);
 
 		    Date dateNow = new Date();
 

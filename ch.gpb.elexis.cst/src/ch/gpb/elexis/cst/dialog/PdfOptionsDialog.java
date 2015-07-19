@@ -33,7 +33,7 @@ public class PdfOptionsDialog extends TitleAreaDialog {
     private String docHeigth = "842";
     public static int OPTION_ONE_PAGE = 1;
     public static int OPTION_SPLIT_PAGE = 2;
-    private static String[] options = new String[] { "Ausgabe auf einer PDF-Seite", "Ausgabe auf A4 Seiten aufgeteilt" };
+    private static String[] options = new String[] { "Ausgabe auf A4 Seiten aufgeteilt", "Ausgabe auf einer PDF-Seite" };
     int selectedIndex = 0;
     private Composite container_1;
 
@@ -105,9 +105,9 @@ public class PdfOptionsDialog extends TitleAreaDialog {
     public int getPdfOutputOption() {
 
 	if (selectedIndex == 0) {
-	    return OPTION_ONE_PAGE;
-	} else if (selectedIndex == 1) {
 	    return OPTION_SPLIT_PAGE;
+	} else if (selectedIndex == 1) {
+	    return OPTION_ONE_PAGE;
 	} else {
 	    return 0;
 	}

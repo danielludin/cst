@@ -148,10 +148,11 @@ public class CstResultEffektiv extends CstResultPart {
 		    if (labItem.getEinheit().length() > 0) {
 			txL2 += " (" + labItem.getEinheit() + ")";
 
-		    }
-		    if (labItem.getKuerzel() != null) {
-			txL2 += "  " + labItem.getKuerzel();
-		    }
+		    }/*
+		     if (labItem.getKuerzel() != null) {
+		     txL2 += "  " + labItem.getKuerzel();
+		     }*/
+
 		    l2.setText(txL2);
 		    l2.setFont(fontMedium);
 		    l2.setBackground(LIGHTGRAY);
@@ -261,71 +262,79 @@ public class CstResultEffektiv extends CstResultPart {
 			datesForVorwert.remove(datesForVorwert.size() - 1);
 		    }
 
+		    // Formatting the Ref values
+
 		    // process the Ranges of Labresult for Display, again there is crappy data, so lots of checks are necessary
-		    String sRangeStart = "0";
-
-		    if (patient.getGeschlecht().toLowerCase().equals("m")) {
-
-			if (labItem.getRefM() != null) {
-			    sRangeStart = labItem.getRefM();
-			} else {
-			    if (labItem.getRefW() != null) {
-				sRangeStart = labItem.getRefW();
-			    }
-			}
-
-		    } else {
-			if (labItem.getRefW() != null) {
-			    sRangeStart = labItem.getRefW();
-			} else {
-			    if (labItem.getRefM() != null) {
-				sRangeStart = labItem.getRefM();
-			    }
-			}
-		    }
-
-		    sRangeStart = sRangeStart.trim();
-		    double dRangeStart = 0;
-		    double dRangeEnd = 0;
-
-		    try {
-			if (sRangeStart.startsWith("-")) {
-			    sRangeStart = sRangeStart.replace("-", "");
-			    dRangeEnd = Double.parseDouble(sRangeStart);
-			    dRangeStart = 0;
-			} else if (sRangeStart.startsWith("<")) {
-			    sRangeStart = sRangeStart.replace("<", "");
-			    dRangeEnd = Double.parseDouble(sRangeStart);
-			    dRangeStart = 0;
-
-			} else if (sRangeStart.startsWith(">")) {
-			    sRangeStart = sRangeStart.replace(">", "");
-			    dRangeStart = Double.parseDouble(sRangeStart);
-			    dRangeEnd = 0;
-
-			} // if there is only a single number, it's probably the End of range value.
-			else if (sRangeStart.matches("\\d*")) {
-			    dRangeEnd = Double.parseDouble(sRangeStart);
-			    dRangeStart = 0;
-
-			} else {
-			    String[] values = sRangeStart.split("-");
-			    dRangeStart = Double.parseDouble(values[0]);
-			    dRangeEnd = Double.parseDouble(values[1]);
-			}
-		    } catch (NumberFormatException e) {
-			log.error("NumberFormatException for start range of  Pat ID:" + aProfile.getKontaktId()
-				+ ":" + labItem.getName() + ":" + "/" + sRangeStart + e.getMessage(), Log.ERRORS);
-		    } catch (ArrayIndexOutOfBoundsException e) {
-			log.error("ArrayIndexOutOfBoundsException for start range of " + labItem.getName() + ":"
-				+ "/" + sRangeStart + e.getMessage(), Log.ERRORS);
-		    }
 		    /*
-		     * System.err.println("Formatting Refs: " + sRangeStart
-		     * + " => " + dRangeStart + "/" + dRangeEnd);
-		     */
-		    log.debug("Formatting Reference Values of Labitem: " + labItem.getName() + ":\t" + sRangeStart
-			    + " => " + dRangeStart + "/" + dRangeEnd);
+		    		    String sRangeStart = "0";
+
+		    		    if (patient.getGeschlecht().toLowerCase().equals("m")) {
+
+		    		    if (labItem.getRefM() != null) {
+		    		        sRangeStart = labItem.getRefM();
+		    		    } else {
+		    		        if (labItem.getRefW() != null) {
+		    		    	sRangeStart = labItem.getRefW();
+		    		        }
+		    		    }
+
+		    		    } else {
+		    		    if (labItem.getRefW() != null) {
+		    		        sRangeStart = labItem.getRefW();
+		    		    } else {
+		    		        if (labItem.getRefM() != null) {
+		    		    	sRangeStart = labItem.getRefM();
+		    		        }
+		    		    }
+		    		    }
+
+		    		    sRangeStart = sRangeStart.trim();
+		    		    double dRangeStart = 0;
+		    		    double dRangeEnd = 0;
+
+		    		    try {
+		    		    if (sRangeStart.startsWith("-")) {
+		    		        sRangeStart = sRangeStart.replace("-", "");
+		    		        dRangeEnd = Double.parseDouble(sRangeStart);
+		    		        dRangeStart = 0;
+		    		    } else if (sRangeStart.startsWith("<")) {
+		    		        sRangeStart = sRangeStart.replace("<", "");
+		    		        dRangeEnd = Double.parseDouble(sRangeStart);
+		    		        dRangeStart = 0;
+
+		    		    } else if (sRangeStart.startsWith(">")) {
+		    		        sRangeStart = sRangeStart.replace(">", "");
+		    		        dRangeStart = Double.parseDouble(sRangeStart);
+		    		        dRangeEnd = 0;
+
+		    		    } // if there is only a single number, it's probably the End of range value.
+		    		    else if (sRangeStart.matches("\\d*")) {
+		    		        dRangeEnd = Double.parseDouble(sRangeStart);
+		    		        dRangeStart = 0;
+
+		    		    } else {
+		    		        String[] values = sRangeStart.split("-");
+		    		        dRangeStart = Double.parseDouble(values[0]);
+		    		        dRangeEnd = Double.parseDouble(values[1]);
+		    		    }
+		    		    } catch (NumberFormatException e) {
+		    		    log.error("NumberFormatException for start range of  Pat ID:" + aProfile.getKontaktId()
+		    		    	+ ":" + labItem.getName() + ":" + "/" + sRangeStart + e.getMessage(), Log.ERRORS);
+		    		    } catch (ArrayIndexOutOfBoundsException e) {
+		    		    log.error("ArrayIndexOutOfBoundsException for start range of " + labItem.getName() + ":"
+		    		    	+ "/" + sRangeStart + e.getMessage(), Log.ERRORS);
+		    		    }
+
+		    		    log.debug("Formatting Reference Values of Labitem: " + labItem.getName() + ":\t" + sRangeStart
+		    		        + " => " + dRangeStart + "/" + dRangeEnd);
+		    */
+
+
+		    double[] dRanges = extractRefValues(labItem);
+		    double dRangeStart = dRanges[0];
+		    double dRangeEnd = dRanges[1];
+
+		    // Formatting the Result values
 
 		    String sResult = "";
 

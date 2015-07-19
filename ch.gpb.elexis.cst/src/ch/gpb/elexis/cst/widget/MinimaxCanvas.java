@@ -10,12 +10,16 @@
  *******************************************************************************/
 package ch.gpb.elexis.cst.widget;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.gpb.elexis.cst.data.MinimaxValue;
 import ch.gpb.elexis.cst.service.CstService;
 
@@ -29,7 +33,7 @@ import ch.gpb.elexis.cst.service.CstService;
 public class MinimaxCanvas extends CstCanvas {
 
     int iPixX = 774; // Anzeigebreite in pix
-    int iPixY = 120; // Anzeigehöhe in pix
+    int iPixY = 140; // Anzeigehöhe in pix
     int xoffBase = 4; // x offset
     int yoffBase = 140; // y offset
     int werteBereich = 160; // Wertebereich der in iPixY/X angezeigt werden soll
@@ -58,7 +62,6 @@ public class MinimaxCanvas extends CstCanvas {
 	this.finding = finding;
     }
 
-
     void paintControl(PaintEvent e) {
 
 	GC gc = e.gc;
@@ -71,9 +74,17 @@ public class MinimaxCanvas extends CstCanvas {
 	//		int xOff1 = 20;
 	//		int xOff2 = 320;
 	//		int xOff3 = 620;
-	int xOff1 = 20;
-	int xOff2 = 280;
-	int xOff3 = 520;
+	int xOff1 = 0;
+	//int xOff2 = 280;
+	//int xOff3 = 520;
+	/*
+		int xOff2 = 200;
+		int xOff3 = 400;
+		int xOff4 = 600;
+	*/
+	int xOff2 = 170;
+	int xOff3 = 340;
+	int xOff4 = 510;
 
 	gc.setForeground(BLUE);
 	//gc.drawRectangle(xoffBase, yoffBase, 400, 1);
@@ -81,16 +92,29 @@ public class MinimaxCanvas extends CstCanvas {
 	gc.setFont(fontBig);
 	gc.setForeground(DARKGRAY);
 
-	//gc.drawRectangle(0, 0, iPixX-1, iPixY-1);
-	//gc.drawLine(280, 0, 280, iPixY);
-	//gc.drawLine(540, 0, 540, iPixY);
+	/*
 	gc.drawLine(260, 0, 260, iPixY);
 	gc.drawLine(500, 0, 500, iPixY);
-	//gc.drawLine(770, 0, 770, iPixY);
-	//gc.drawLine(774, 0, 774, iPixY);
+	*/
+	gc.drawLine(xOff2, 0, xOff2, iPixY);
+	gc.drawLine(xOff3, 0, xOff3, iPixY);
+	gc.drawLine(xOff4, 0, xOff4, iPixY);
+
 	gc.drawLine(iPixX, 0, iPixX, iPixY);
 
-	gc.drawText(finding.getName(), xOff1, 2, true);
+	StringBuffer title = new StringBuffer(finding.getName());
+	if (finding.getRangeStart() > 0 && finding.getRangeEnd() > 0) {
+
+	    title.append(" (");
+	    title.append(finding.getRangeStart());
+	    title.append(" - ");
+	    title.append(finding.getRangeEnd());
+	    title.append(" )");
+	} else {
+	    title.append(" (keine Ref.Werte)");
+	}
+
+	gc.drawText(title.toString(), xOff1, 2, true);
 
 	gc.setFont(fontSmall);
 	gc.setForeground(BLUE);
@@ -99,7 +123,7 @@ public class MinimaxCanvas extends CstCanvas {
 		+ "von\t" + CstService.getGermanFromDate(finding.getDateStartOfSpan3())
 		+
 		"\r\nbis\t" + CstService.getGermanFromDate(finding.getDateEndOfSpan3()) + ": ",
-		xOff1, 30);
+		xOff1 + 10, 30);
 
 	if (finding.getMaxOfSpan3() == -1) {
 	    gc.drawText("Maximum:\t keine Werte",
@@ -126,7 +150,7 @@ public class MinimaxCanvas extends CstCanvas {
 	gc.drawText("Zeitspanne \r\n"
 		+ "von\t" + CstService.getGermanFromDate(finding.getDateStartOfSpan2()) +
 		"\r\nbis\t" + CstService.getGermanFromDate(finding.getDateEndOfSpan2()) + ": ",
-		xOff2, 30);
+		xOff2 + 10, 30);
 
 	if (finding.getMaxOfSpan2() == -1) {
 	    gc.drawText("Maximum:\t keine Werte",
@@ -151,7 +175,7 @@ public class MinimaxCanvas extends CstCanvas {
 	gc.drawText("Zeitspanne \r\n"
 		+ "von\t" + CstService.getGermanFromDate(finding.getDateStartOfSpan1()) +
 		"\r\nbis\t" + CstService.getGermanFromDate(finding.getDateEndOfSpan1()) + ": ",
-		xOff3, 30);
+		xOff3 + 10, 30);
 
 	if (finding.getMaxOfSpan1() == -1) {
 	    gc.drawText("Maximum:\tkeine Werte",
@@ -171,9 +195,31 @@ public class MinimaxCanvas extends CstCanvas {
 		    xOff3 + 10, 96, true);
 	}
 
+	/*
+	StyledText styledText = new StyledText(this, SWT.NONE);
+	styledText.setText(finding.getAbstract());
+	styledText.setWordWrap(true);
+	styledText.setSize(200, 300);
+	gc.drawText(styledText.getText(),
+		xOff3 + 210, 20, true);
+	*/
+	final TextLayout layout = new TextLayout(getDisplay());
+	layout.setText(finding.getAbstract());
+	layout.setWidth(250);
+	Font fontNormal = UiDesk.getFont("Helvetica", 7, SWT.NORMAL); //$NON-NLS-1$
+	layout.setFont(fontNormal);
+
+	layout.draw(gc, xOff4 + 4, 4);
+
+	//TextStyle textStyle = new TextStyle();
+	//textStyle.
+	/*
+	gc.drawText(finding.getAbstract(),
+		xOff3 + 210, 20, true);
+	 */
+
 	gc.dispose();
     }
-
 
     public Point computeSize(int wHint, int hHint, boolean changed) {
 	return new Point(iPixX, iPixY);
