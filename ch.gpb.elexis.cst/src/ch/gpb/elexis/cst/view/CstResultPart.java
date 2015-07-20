@@ -1314,8 +1314,8 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 	@Override
 	public int compare(LabItem o1, LabItem o2) {
-	    Integer r1 = (Integer) itemRanking.get(o1.getName());
-	    Integer r2 = (Integer) itemRanking.get(o2.getName());
+	    Integer r1 = (Integer) itemRanking.get(o1.getId());
+	    Integer r2 = (Integer) itemRanking.get(o2.getId());
 	    if (r1 == null || r2 == null) {
 		return 0;
 	    }
@@ -1336,8 +1336,8 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
 	@Override
 	public int compare(CstGroup o1, CstGroup o2) {
-	    Integer r1 = (Integer) itemRanking.get(o1.getName());
-	    Integer r2 = (Integer) itemRanking.get(o2.getName());
+	    Integer r1 = (Integer) itemRanking.get(o1.getId());
+	    Integer r2 = (Integer) itemRanking.get(o2.getId());
 	    if (r1 == null || r2 == null) {
 		return 0;
 	    }
