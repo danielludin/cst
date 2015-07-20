@@ -297,7 +297,7 @@ public class CstThemenblockEditor extends ViewPart implements
 				Hashtable<Object, Object> ranking = new Hashtable<Object, Object>();
 				int i = 1;
 				for (LabItem item : labItems) {
-				    ranking.put(item.getName(), i++);
+				    ranking.put(item.getId(), i++);
 				}
 				itemRanking = (Map<Object, Object>) ranking.clone();
 				selGroup.setMap(CstGroup.ITEMRANKING, ranking);
@@ -494,10 +494,10 @@ public class CstThemenblockEditor extends ViewPart implements
 	    TableItem tableItem = tableViewerLabItem.getTable().getItem(selIndex - 1);
 	    LabItem aboveItem = (LabItem) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getName());
-	    int rank2 = (int) itemRanking.get(aboveItem.getName());
-	    itemRanking.put(selItem.getName(), rank1 - 1);
-	    itemRanking.put(aboveItem.getName(), rank2 + 1);
+	    int rank1 = (int) itemRanking.get(selItem.getId());
+	    int rank2 = (int) itemRanking.get(aboveItem.getId());
+	    itemRanking.put(selItem.getId(), rank1 - 1);
+	    itemRanking.put(aboveItem.getId(), rank2 + 1);
 
 	    selGroup.setMap(CstGroup.ITEMRANKING, itemRanking);
 
@@ -526,10 +526,10 @@ public class CstThemenblockEditor extends ViewPart implements
 	    TableItem tableItem = tableViewerLabItem.getTable().getItem(selIndex + 1);
 	    LabItem belowItem = (LabItem) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getName());
-	    int rank2 = (int) itemRanking.get(belowItem.getName());
-	    itemRanking.put(selItem.getName(), rank1 + 1);
-	    itemRanking.put(belowItem.getName(), rank2 - 1);
+	    int rank1 = (int) itemRanking.get(selItem.getId());
+	    int rank2 = (int) itemRanking.get(belowItem.getId());
+	    itemRanking.put(selItem.getId(), rank1 + 1);
+	    itemRanking.put(belowItem.getId(), rank2 - 1);
 
 	    selGroup.setMap(CstGroup.ITEMRANKING, itemRanking);
 
@@ -850,14 +850,14 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	int i = 1;
 	for (LabItem item : labItems) {
-	    ranking.put(item.getName(), i++);
+	    ranking.put(item.getId(), i++);
 	}
 
 	itemRanking = (Map) ranking.clone();
 	selGroup.setMap(CstGroup.ITEMRANKING, ranking);
 	log.debug("reinitialize the ranking");
 
-	tableViewerLabItem.refresh();
+	//tableViewerLabItem.refresh();
     }
 
     private void hookDoubleClickAction() {
@@ -1061,14 +1061,14 @@ public class CstThemenblockEditor extends ViewPart implements
 	    case 1:
 		return labItem.getKuerzel();
 	    case 2:
-		if (itemRanking.get(labItem.getName()) == null) {
+		if (itemRanking.get(labItem.getId()) == null) {
 		    IStructuredSelection selection = (IStructuredSelection) tableViewerCstGroup.getSelection();
 		    Object o = ((IStructuredSelection) selection).getFirstElement();
 		    CstGroup profile = (CstGroup) o;
 		    reinitRanking(profile);
 
 		}
-		return String.valueOf(itemRanking.get(labItem.getName()));
+		return String.valueOf(itemRanking.get(labItem.getId()));
 	    case 3:
 		return labItem.getRefM();
 	    case 4:
@@ -1145,8 +1145,8 @@ public class CstThemenblockEditor extends ViewPart implements
 		LabItem d1 = (LabItem) e1;
 		LabItem d2 = (LabItem) e2;
 
-		Integer r1 = (Integer) itemRanking.get(d1.getName());
-		Integer r2 = (Integer) itemRanking.get(d2.getName());
+		Integer r1 = (Integer) itemRanking.get(d1.getId());
+		Integer r2 = (Integer) itemRanking.get(d2.getId());
 		if (r1 == null || r2 == null) {
 		    return 0;
 		}

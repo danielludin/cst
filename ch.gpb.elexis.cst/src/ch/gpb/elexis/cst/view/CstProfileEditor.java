@@ -523,7 +523,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 			Hashtable<Object, Object> ranking = new Hashtable<Object, Object>();
 			int i = 1;
 			for (CstGroup item : cstGroups) {
-			    ranking.put(item.getName(), i++);
+			    ranking.put(item.getId(), i++);
 
 			}
 			itemRanking = (Map<Object, Object>) ranking.clone();
@@ -576,10 +576,10 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    TableItem tableItem = tableViewerCstGroups.getTable().getItem(selIndex - 1);
 	    CstGroup aboveItem = (CstGroup) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getName());
-	    int rank2 = (int) itemRanking.get(aboveItem.getName());
-	    itemRanking.put(selItem.getName(), rank1 - 1);
-	    itemRanking.put(aboveItem.getName(), rank2 + 1);
+	    int rank1 = (int) itemRanking.get(selItem.getId());
+	    int rank2 = (int) itemRanking.get(aboveItem.getId());
+	    itemRanking.put(selItem.getId(), rank1 - 1);
+	    itemRanking.put(aboveItem.getId(), rank2 + 1);
 
 	    selProfile.setMap(CstProfile.ITEMRANKING, itemRanking);
 
@@ -610,10 +610,10 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    TableItem tableItem = tableViewerCstGroups.getTable().getItem(selIndex + 1);
 	    CstGroup belowItem = (CstGroup) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getName());
-	    int rank2 = (int) itemRanking.get(belowItem.getName());
-	    itemRanking.put(selItem.getName(), rank1 + 1);
-	    itemRanking.put(belowItem.getName(), rank2 - 1);
+	    int rank1 = (int) itemRanking.get(selItem.getId());
+	    int rank2 = (int) itemRanking.get(belowItem.getId());
+	    itemRanking.put(selItem.getId(), rank1 + 1);
+	    itemRanking.put(belowItem.getId(), rank2 - 1);
 
 	    selProfile.setMap(CstProfile.ITEMRANKING, itemRanking);
 
@@ -1402,13 +1402,13 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
 	int x = 1;
 	for (CstGroup item : cstGroups) {
-	    ranking.put(item.getName(), x++);
+	    ranking.put(item.getId(), x++);
 	}
 
 	itemRanking = (Map<Object, Object>) ranking.clone();
 	selGroup.setMap(CstProfile.ITEMRANKING, ranking);
 
-	tableViewerCstGroups.refresh();
+	//tableViewerCstGroups.refresh();
     }
 
     private void hookDoubleClickAction() {
@@ -1598,15 +1598,15 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    case 1:
 		return labItem.getDescription();
 	    case 2:
-		/*
-		Object ranking = itemRanking.get(labItem.getName());
+
+		Object ranking = itemRanking.get(labItem.getId());
 		if (ranking == null) {
 		    showMessage("Error with Ranking. Reinitializing...");
 		    reinitRanking(getSelectedProfile());
 		}
-		 */
 
-		return String.valueOf(itemRanking.get(labItem.getName()));
+
+		return String.valueOf(itemRanking.get(labItem.getId()));
 	    default:
 		return "?";
 	    }
@@ -1654,8 +1654,8 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
 		}*/
 
-		Integer r1 = (Integer) itemRanking.get(d1.getName());
-		Integer r2 = (Integer) itemRanking.get(d2.getName());
+		Integer r1 = (Integer) itemRanking.get(d1.getId());
+		Integer r2 = (Integer) itemRanking.get(d2.getId());
 		if (r1 == null || r2 == null) {
 		    return 0;
 		}
