@@ -44,6 +44,7 @@ public class MinimaxValue {
     private double dMaxOfSpan3;
 
     private String name = "no name set";
+    private String text = "";
 
     public MinimaxValue(double dRangeStart, double dRangeEnd, String sAbstract, Date sDateStartOfSpan1,
 	    Date sDateEndOfSpan1,
@@ -214,6 +215,14 @@ public class MinimaxValue {
 
     public void setAbstract(String sAbstract) {
 	this.sAbstract = sAbstract;
+    }
+
+    public String getText() {
+	return text;
+    }
+
+    public void setText(String text) {
+	this.text = text;
     }
 
 }

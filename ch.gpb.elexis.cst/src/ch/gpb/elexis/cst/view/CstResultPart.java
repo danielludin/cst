@@ -79,6 +79,7 @@ import ch.gpb.elexis.cst.data.CstGastroColo;
 import ch.gpb.elexis.cst.data.CstGroup;
 import ch.gpb.elexis.cst.data.CstProfile;
 import ch.gpb.elexis.cst.data.CstProimmun;
+import ch.gpb.elexis.cst.data.LabItemWrapper;
 import ch.gpb.elexis.cst.data.ValuePairTimeline;
 import ch.gpb.elexis.cst.data.ValueSingleTimeline;
 import ch.gpb.elexis.cst.dialog.PdfOptionsDialog;
@@ -1303,7 +1304,7 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	return resultList;
     }
 
-    class LabItemSorter implements Comparator<LabItem> {
+    class LabItemSorter implements Comparator<LabItemWrapper> {
 
 	Map<String, Integer> itemRanking;
 
@@ -1313,9 +1314,9 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 	}
 
 	@Override
-	public int compare(LabItem o1, LabItem o2) {
-	    Integer r1 = (Integer) itemRanking.get(o1.getId());
-	    Integer r2 = (Integer) itemRanking.get(o2.getId());
+	public int compare(LabItemWrapper o1, LabItemWrapper o2) {
+	    Integer r1 = (Integer) itemRanking.get(o1.getLabItem().getId());
+	    Integer r2 = (Integer) itemRanking.get(o2.getLabItem().getId());
 	    if (r1 == null || r2 == null) {
 		return 0;
 	    }

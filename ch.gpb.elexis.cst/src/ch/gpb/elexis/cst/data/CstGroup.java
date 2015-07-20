@@ -65,6 +65,7 @@ public class CstGroup extends PersistentObject {
 	    + "	`lastupdate` BIGINT(20) NULL DEFAULT NULL,"
 	    + "	`GroupID` VARCHAR(25) NULL DEFAULT NULL,"
 	    + "	`ItemID` VARCHAR(25) NULL DEFAULT NULL,"
+	    + "	`DisplayOnce` CHAR(1) NOT NULL DEFAULT '0',"
 	    + "	`Comment` TEXT NULL,"
 	    + "	UNIQUE INDEX `GroupID` (`GroupID`, `ItemID`)" + ")"
 	    + " COLlATE='utf8_general_ci' ENGINE=InnoDB;";
@@ -212,39 +213,52 @@ public class CstGroup extends PersistentObject {
 	return qbe.execute();
     }
 
-    public List<LabItem> getLabitems() {
-	List<String[]> lResp = getList("Labitems", new String[0]);
-	ArrayList<LabItem> ret = new ArrayList<LabItem>(lResp.size());
+    public List<LabItemWrapper> getLabitems() {
+	List<String[]> lResp = getList("Labitems", new String[] { "displayOnce" });
+	ArrayList<LabItemWrapper> ret = new ArrayList<LabItemWrapper>(lResp.size());
 	for (String[] r : lResp) {
-	    ret.add(LabItem.load(r[0]));
+
+	    //ret.add(new LabItem.load(r[0]));
+	    ret.add(new LabItemWrapper(LabItem.load(r[0]), r[1]));
+	    System.out.println("DisplayOnce;" + r[1]);
 	}
 	return ret;
     }
 
     // remove a LabItem from the CST Category
     public void removeLabitem(final LabItem a) {
-	for (LabItem labitem : getLabitems()) {
-	    if (labitem.getId().equalsIgnoreCase(a.getId()))
+	for (LabItemWrapper labitem : getLabitems()) {
+	    if (labitem.getLabItem().getId().equalsIgnoreCase(a.getId()))
 		removeFromList("Labitems", a.getId());
 	}
     }
 
-    public void addItem(LabItem item) {
-	if (item != null && (item.state() == EXISTS)) {
+    public int setDisplayOnce(LabItemWrapper labItem, String displayOnce) {
+	StringBuffer sql = new StringBuffer();
+	sql.append("UPDATE " + GROUP_ITEM_TABLENAME + " SET DisplayOnce = '").append(displayOnce)
+		.append("' WHERE GroupID = ").append(getWrappedId())
+		.append(" AND ItemId = ").append(labItem.getLabItem().getWrappedId());
+	int result = j.exec(sql.toString());
+	return result;
+    }
+
+    public void addItem(LabItemWrapper item) {
+	if (item != null && (item.getLabItem().state() == EXISTS)) {
 	    // add item if it doesn't yet exists
 	    String exists =
 		    j.queryString("SELECT ItemID FROM " + GROUP_ITEM_TABLENAME + " WHERE GroupID = "
-			    + getWrappedId() + " AND ItemID = " + item.getWrappedId());
+			    + getWrappedId() + " AND ItemID = " + item.getLabItem().getWrappedId());
 	    if (StringTool.isNothing(exists)) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("INSERT INTO " + GROUP_ITEM_TABLENAME + " (GroupID, ItemID) VALUES (")
-			.append(getWrappedId()).append(",").append(item.getWrappedId()).append(")");
+		sql.append("INSERT INTO " + GROUP_ITEM_TABLENAME + " (GroupID, ItemID, DisplayOnce) VALUES (")
+			.append(getWrappedId()).append(",").append(item.getLabItem().getWrappedId()).append(", ")
+			.append(item.getDisplayOnce()).append(")");
 		j.exec(sql.toString());
 	    }
 	    else {
-		log.error("Lab item " + item.getName() + " already exists in CSTGroup: " + this.getName());
+		log.error("Lab item " + item.getLabItem().getName() + " already exists in CSTGroup: " + this.getName());
 		throw new IllegalArgumentException(String.format(
-			"There is already a category of name [%s] - [%s]", item.getName()));
+			"There is already a category of name [%s] - [%s]", item.getLabItem().getName()));
 
 	    }
 	}
@@ -261,9 +275,9 @@ public class CstGroup extends PersistentObject {
     	}
     	addToList("Labitems", a.getId(), (String[]) null);
     }*/
-    public void addItems(List<LabItem> items) {
+    public void addItems(List<LabItemWrapper> items) {
 	if (items != null) {
-	    for (LabItem item : items) {
+	    for (LabItemWrapper item : items) {
 		addItem(item);
 	    }
 	}

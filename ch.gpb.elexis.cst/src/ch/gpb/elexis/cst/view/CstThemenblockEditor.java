@@ -82,6 +82,7 @@ import ch.elexis.data.Patient;
 import ch.gpb.elexis.cst.Activator;
 import ch.gpb.elexis.cst.data.CstAbstract;
 import ch.gpb.elexis.cst.data.CstGroup;
+import ch.gpb.elexis.cst.data.LabItemWrapper;
 import ch.gpb.elexis.cst.dialog.CstCategoryDialog;
 import ch.gpb.elexis.cst.dialog.CstLabItemSelectionDialog;
 import ch.gpb.elexis.cst.dialog.ThemenblockDetailDialog;
@@ -122,13 +123,14 @@ public class CstThemenblockEditor extends ViewPart implements
     private Action actionDeleteCstGroup;
     private Action actionRemoveLabItem;
     private Action actionAddLabItems;
+    private Action actionDisplayOnce;
     private Table tableCstGroup;
     private Table tableLabItem;
     private int sortColumn = 0;
     private boolean sortReverse = false;
     private Color myColorRed;
     private List<CstGroup> cstGroups;
-    private List<LabItem> labItems = new ArrayList<LabItem>();
+    private List<LabItemWrapper> labItems = new ArrayList<LabItemWrapper>();
     private List<LabItem> dialogLabItems = new ArrayList<LabItem>();
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     //static Random rnd = new Random();
@@ -296,8 +298,8 @@ public class CstThemenblockEditor extends ViewPart implements
 			    if (itemRanking == null || itemRanking.size() == 0) {
 				Hashtable<Object, Object> ranking = new Hashtable<Object, Object>();
 				int i = 1;
-				for (LabItem item : labItems) {
-				    ranking.put(item.getId(), i++);
+				for (LabItemWrapper item : labItems) {
+				    ranking.put(item.getLabItem().getId(), i++);
 				}
 				itemRanking = (Map<Object, Object>) ranking.clone();
 				selGroup.setMap(CstGroup.ITEMRANKING, ranking);
@@ -411,10 +413,10 @@ public class CstThemenblockEditor extends ViewPart implements
 	    public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection selection = (IStructuredSelection) tableViewerLabItem.getSelection();
 		// on selecting a new Category, fetch its LabItems
-		LabItem selItem = (LabItem) selection.getFirstElement();
+		LabItemWrapper selItem = (LabItemWrapper) selection.getFirstElement();
 		if (selItem != null) {
 		    //labItems = selItem.getLabitems();
-		    CstAbstract abst = CstAbstract.getByLaboritemId(selItem.getId());
+		    CstAbstract abst = CstAbstract.getByLaboritemId(selItem.getLabItem().getId());
 
 		    String text;
 		    if (abst == null) {
@@ -448,11 +450,11 @@ public class CstThemenblockEditor extends ViewPart implements
      */
     private void saveAbstract() {
 	TableItem[] selItemC = tableLabItem.getSelection();
-	LabItem selGroup = (LabItem) selItemC[0].getData();
+	LabItemWrapper selGroup = (LabItemWrapper) selItemC[0].getData();
 
-	CstAbstract abst = CstAbstract.getByLaboritemId(selGroup.getId());
+	CstAbstract abst = CstAbstract.getByLaboritemId(selGroup.getLabItem().getId());
 	if (abst == null) {
-	    abst = new CstAbstract(selGroup.getId(),
+	    abst = new CstAbstract(selGroup.getLabItem().getId(),
 		    txtAbstract.getText(), "description2");
 
 	} else {
@@ -481,7 +483,7 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	try {
 	    IStructuredSelection selection = (IStructuredSelection) tableViewerLabItem.getSelection();
-	    LabItem selItem = (LabItem) selection.getFirstElement();
+	    LabItemWrapper selItem = (LabItemWrapper) selection.getFirstElement();
 	    if (selItem == null) {
 		return;
 	    }
@@ -492,12 +494,12 @@ public class CstThemenblockEditor extends ViewPart implements
 	    }
 
 	    TableItem tableItem = tableViewerLabItem.getTable().getItem(selIndex - 1);
-	    LabItem aboveItem = (LabItem) tableItem.getData();
+	    LabItemWrapper aboveItem = (LabItemWrapper) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getId());
-	    int rank2 = (int) itemRanking.get(aboveItem.getId());
-	    itemRanking.put(selItem.getId(), rank1 - 1);
-	    itemRanking.put(aboveItem.getId(), rank2 + 1);
+	    int rank1 = (int) itemRanking.get(selItem.getLabItem().getId());
+	    int rank2 = (int) itemRanking.get(aboveItem.getLabItem().getId());
+	    itemRanking.put(selItem.getLabItem().getId(), rank1 - 1);
+	    itemRanking.put(aboveItem.getLabItem().getId(), rank2 + 1);
 
 	    selGroup.setMap(CstGroup.ITEMRANKING, itemRanking);
 
@@ -514,7 +516,7 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	try {
 	    IStructuredSelection selection = (IStructuredSelection) tableViewerLabItem.getSelection();
-	    LabItem selItem = (LabItem) selection.getFirstElement();
+	    LabItemWrapper selItem = (LabItemWrapper) selection.getFirstElement();
 	    if (selItem == null) {
 		return;
 	    }
@@ -524,12 +526,12 @@ public class CstThemenblockEditor extends ViewPart implements
 	    }
 
 	    TableItem tableItem = tableViewerLabItem.getTable().getItem(selIndex + 1);
-	    LabItem belowItem = (LabItem) tableItem.getData();
+	    LabItemWrapper belowItem = (LabItemWrapper) tableItem.getData();
 
-	    int rank1 = (int) itemRanking.get(selItem.getId());
-	    int rank2 = (int) itemRanking.get(belowItem.getId());
-	    itemRanking.put(selItem.getId(), rank1 + 1);
-	    itemRanking.put(belowItem.getId(), rank2 - 1);
+	    int rank1 = (int) itemRanking.get(selItem.getLabItem().getId());
+	    int rank2 = (int) itemRanking.get(belowItem.getLabItem().getId());
+	    itemRanking.put(selItem.getLabItem().getId(), rank1 + 1);
+	    itemRanking.put(belowItem.getLabItem().getId(), rank2 - 1);
 
 	    selGroup.setMap(CstGroup.ITEMRANKING, itemRanking);
 
@@ -589,7 +591,7 @@ public class CstThemenblockEditor extends ViewPart implements
     private String[] getLabItemsColumnLabels() {
 
 	String columnLabels[] = { Messages.CstLaborPrefs_name, Messages.CstLaborPrefs_short,
-		Messages.CstProfile_Ranking, Messages.CstLaborPrefs_refM, Messages.CstLaborPrefs_refF };
+		Messages.CstProfile_Ranking, Messages.CstLaborPrefs_refM, Messages.CstLaborPrefs_refF, "Immer anzeigen" };
 
 	return columnLabels;
     }
@@ -600,7 +602,7 @@ public class CstThemenblockEditor extends ViewPart implements
     }
 
     private int[] getColumnWidthLabItem() {
-	int columnWidth[] = { 200, 200, 40, 120, 120 };
+	int columnWidth[] = { 200, 200, 40, 120, 120, 50 };
 	return columnWidth;
     }
 
@@ -651,6 +653,7 @@ public class CstThemenblockEditor extends ViewPart implements
     private void fillContextMenuLabItem(IMenuManager manager) {
 	manager.add(actionRemoveLabItem);
 	manager.add(actionAddLabItems);
+	manager.add(actionDisplayOnce);
 	manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
@@ -763,10 +766,10 @@ public class CstThemenblockEditor extends ViewPart implements
 		if (selItem.length == 0) {
 		    return;
 		}
-		LabItem labItem = (LabItem) selItem[0].getData();
-		log.debug("LabItem ID:" + labItem.getId());
+		LabItemWrapper labItem = (LabItemWrapper) selItem[0].getData();
+		log.debug("LabItem ID:" + labItem.getLabItem().getId());
 
-		selGroup.removeLabitem(labItem);
+		selGroup.removeLabitem(labItem.getLabItem());
 
 		loadGroups();
 
@@ -785,9 +788,40 @@ public class CstThemenblockEditor extends ViewPart implements
 		.getSharedImages()
 		.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 
+	actionDisplayOnce = new Action() {
+	    public void run() {
+		TableItem[] selItemC = tableCstGroup.getSelection();
+		CstGroup selGroup = (CstGroup) selItemC[0].getData();
+
+		TableItem[] selItem = tableLabItem.getSelection();
+		if (selItem.length == 0) {
+		    return;
+		}
+		LabItemWrapper labItem = (LabItemWrapper) selItem[0].getData();
+		log.debug("LabItem ID:" + labItem.getLabItem().getId());
+
+		int ret = selGroup.setDisplayOnce(labItem, labItem.getDisplayOnce().equals("1") ? "0" : "1");
+
+		loadGroups();
+
+		//tableViewerCstGroup.refresh();
+		labItems = selGroup.getLabitems();
+
+		tableViewerLabItem.refresh();
+		tableCstGroup.setFocus();
+
+	    }
+	};
+	actionDisplayOnce.setText("Immer anzeigen");
+	actionDisplayOnce
+		.setToolTipText(Messages.Cst_Text_delete_from_cstgroup_tooltip);
+	actionDisplayOnce.setImageDescriptor(PlatformUI.getWorkbench()
+		.getSharedImages()
+		.getImageDescriptor(ISharedImages.IMG_TOOL_UP));
+
 	actionAddLabItems = new Action() {
 	    public void run() {
-		List<LabItem> itemsToAdd;
+		List<LabItemWrapper> itemsToAdd;
 		if (dialogLabItems == null || dialogLabItems.size() == 0) {
 		    dialogLabItems = LabItem.getLabItems();
 		}
@@ -799,7 +833,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		dialog.create();
 
 		if (dialog.open() == Window.OK) {
-		    itemsToAdd = dialog.getSelItems();
+		    itemsToAdd = LabItemWrapper.wrap(dialog.getSelItems());
 		} else {
 		    return;
 		}
@@ -848,8 +882,8 @@ public class CstThemenblockEditor extends ViewPart implements
 	Hashtable<Object, Object> ranking = new Hashtable<Object, Object>();
 
 	int i = 1;
-	for (LabItem item : labItems) {
-	    ranking.put(item.getId(), i++);
+	for (LabItemWrapper item : labItems) {
+	    ranking.put(item.getLabItem().getId(), i++);
 	}
 
 	itemRanking = (Map) ranking.clone();
@@ -949,7 +983,7 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	public Font getFont(Object element, int columnIndex) {
 	    Font font = null;
-	    if (element instanceof LabItem) {
+	    if (element instanceof LabItemWrapper) {
 	    }
 	    return font;
 	}
@@ -1052,14 +1086,14 @@ public class CstThemenblockEditor extends ViewPart implements
     class LabItemLabelProvider extends LabelProvider implements
 	    ITableLabelProvider, ITableFontProvider, IColorProvider {
 	public String getColumnText(Object obj, int index) {
-	    LabItem labItem = (LabItem) obj;
+	    LabItemWrapper labItem = (LabItemWrapper) obj;
 	    switch (index) {
 	    case 0:
-		return labItem.getName();
+		return labItem.getLabItem().getName();
 	    case 1:
-		return labItem.getKuerzel();
+		return labItem.getLabItem().getKuerzel();
 	    case 2:
-		if (itemRanking.get(labItem.getId()) == null) {
+		if (itemRanking.get(labItem.getLabItem().getId()) == null) {
 		    IStructuredSelection selection = (IStructuredSelection) tableViewerCstGroup.getSelection();
 		    Object o = ((IStructuredSelection) selection).getFirstElement();
 		    CstGroup profile = (CstGroup) o;
@@ -1067,11 +1101,18 @@ public class CstThemenblockEditor extends ViewPart implements
 		    reinitRanking(profile);
 
 		}
-		return String.valueOf(itemRanking.get(labItem.getId()));
+		return String.valueOf(itemRanking.get(labItem.getLabItem().getId()));
 	    case 3:
-		return labItem.getRefM();
+		return labItem.getLabItem().getRefM();
 	    case 4:
-		return labItem.getRefW();
+		return labItem.getLabItem().getRefW();
+	    case 5:
+		//return labItem.getDisplayOnce();
+		if (labItem.getDisplayOnce() == null) {
+		    return "null";
+		}
+
+		return labItem.getDisplayOnce().equals("1") ? "Ja" : "Nein";
 	    default:
 		return "?";
 	    }
@@ -1088,7 +1129,7 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	public Font getFont(Object element, int columnIndex) {
 	    Font font = null;
-	    if (element instanceof LabItem) {
+	    if (element instanceof LabItemWrapper) {
 	    }
 	    return font;
 	}
@@ -1096,8 +1137,8 @@ public class CstThemenblockEditor extends ViewPart implements
 	@Override
 	public Color getForeground(Object element) {
 	    /*
-	    if (element instanceof LabItem) {
-	    	LabItem labItem = (LabItem) element;
+	    if (element instanceof LabItemWrapper) {
+	    	LabItemWrapper labItem = (LabItemWrapper) element;
 	    	
 	    	if (labItem.getName().startsWith("P")) {
 	    		return myColorRed;
@@ -1140,12 +1181,12 @@ public class CstThemenblockEditor extends ViewPart implements
 
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-	    if ((e1 instanceof LabItem) && (e2 instanceof LabItem)) {
-		LabItem d1 = (LabItem) e1;
-		LabItem d2 = (LabItem) e2;
+	    if ((e1 instanceof LabItemWrapper) && (e2 instanceof LabItemWrapper)) {
+		LabItemWrapper d1 = (LabItemWrapper) e1;
+		LabItemWrapper d2 = (LabItemWrapper) e2;
 
-		Integer r1 = (Integer) itemRanking.get(d1.getId());
-		Integer r2 = (Integer) itemRanking.get(d2.getId());
+		Integer r1 = (Integer) itemRanking.get(d1.getLabItem().getId());
+		Integer r2 = (Integer) itemRanking.get(d2.getLabItem().getId());
 		if (r1 == null || r2 == null) {
 		    return 0;
 		}

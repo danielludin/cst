@@ -53,16 +53,17 @@ public class CstLabItemSelectionDialog extends SelectionDialog {
 	private String firstName;
 	private String lastName;
 	private CheckboxTableViewer tableViewer;
-	private List<LabItem> labItems;
-	public List<LabItem> getSelItems() {
-		return selItems;
-	}
+    private List<LabItem> labItems;
 
-	public void setSelItems(List<LabItem> selItems) {
-		this.selItems = selItems;
-	}
+    public List<LabItem> getSelItems() {
+	return selItems;
+    }
 
-	private List<LabItem> selItems;
+    public void setSelItems(List<LabItem> selItems) {
+	this.selItems = selItems;
+    }
+
+    private List<LabItem> selItems;
 	private int sortColumn = 0;
 	private boolean sortReverse = false;
 
@@ -70,7 +71,7 @@ public class CstLabItemSelectionDialog extends SelectionDialog {
 		super(parentShell);
 	}
 
-	public CstLabItemSelectionDialog(Shell parentShell, List<LabItem> labItems) {
+    public CstLabItemSelectionDialog(Shell parentShell, List<LabItem> labItems) {
 		super(parentShell);
 		this.labItems = labItems;
 	}
@@ -148,10 +149,10 @@ public class CstLabItemSelectionDialog extends SelectionDialog {
 
 	@Override
 	protected void okPressed() {
-		selItems = new ArrayList<LabItem>();
+	selItems = new ArrayList<LabItem>();
 		Object[] checkedItems = tableViewer.getCheckedElements();
 		for (Object object : checkedItems) {
-			LabItem labItem = (LabItem)object;
+	    LabItem labItem = (LabItem) object;
 			selItems.add(labItem);
 		}
 		super.okPressed();
@@ -180,22 +181,22 @@ public class CstLabItemSelectionDialog extends SelectionDialog {
 	class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider, ITableFontProvider, IColorProvider {
 		public String getColumnText(Object obj, int index) {
-			LabItem labItem = (LabItem) obj;
+	    LabItem labItem = (LabItem) obj;
 			switch (index) {
 			case 0:
-				return labItem.getName();
+		return labItem.getName();
 			case 1:
-				return labItem.getKuerzel();
+		return labItem.getKuerzel();
 			case 2:
-				return labItem.getEinheit();
+		return labItem.getEinheit();
 			case 3:
-				return labItem.getPrio();
+		return labItem.getPrio();
 			case 4:
-				return labItem.getGroup();
+		return labItem.getGroup();
 			case 5:
-				return labItem.getRefM();
+		return labItem.getRefM();
 			case 6:
-				return labItem.getRefW();
+		return labItem.getRefW();
 			default:
 				return "?";
 			}

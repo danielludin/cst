@@ -23,15 +23,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import ch.elexis.core.ui.util.Log;
-import ch.elexis.data.LabItem;
 import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
 import ch.gpb.elexis.cst.data.CstAbstract;
 import ch.gpb.elexis.cst.data.CstGroup;
 import ch.gpb.elexis.cst.data.CstProfile;
+import ch.gpb.elexis.cst.data.LabItemWrapper;
 import ch.gpb.elexis.cst.data.MinimaxValue;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.gpb.elexis.cst.service.CstService;
+import ch.gpb.elexis.cst.widget.DisplayOnceCanvas;
 import ch.gpb.elexis.cst.widget.MinimaxCanvas;
 
 /**
@@ -89,7 +90,6 @@ public class CstResultMiniMax extends CstResultPart {
 	    Label labelProfileData = new Label(baseComposite, SWT.NONE);
 	    labelProfileData.setLayoutData(new GridData());
 
-
 	    labelProfileData.setText(getSubTitle(patient, aProfile));
 
 	    labelProfileData.setSize(600, 40);
@@ -104,13 +104,13 @@ public class CstResultMiniMax extends CstResultPart {
 	    Collections.sort(cstGroups, groupSorter);
 
 	    for (CstGroup group : cstGroups) {
-		List<LabItem> labitems = group.getLabitems();
+		List<LabItemWrapper> labitems = group.getLabitems();
 		@SuppressWarnings("unchecked")
 		Map<String, Integer> itemRanking2 = group.getMap(CstGroup.ITEMRANKING);
 		LabItemSorter labItemSorter = new LabItemSorter(itemRanking2);
 		Collections.sort(labitems, labItemSorter);
 
-		for (LabItem labItem : labitems) {
+		for (LabItemWrapper labItem : labitems) {
 
 		    Composite lineCompo = new Composite(baseComposite, SWT.NONE);
 		    lineCompo.setSize(790, 120);
@@ -128,112 +128,166 @@ public class CstResultMiniMax extends CstResultPart {
 
 		    String txL2 = "";
 
-		    if (labItem.getEinheit().length() > 0) {
-			txL2 += " (" + labItem.getEinheit() + ")";
+		    if (labItem.getLabItem().getEinheit().length() > 0) {
+			txL2 += " (" + labItem.getLabItem().getEinheit() + ")";
 
 		    }/*
-		     if (labItem.getKuerzel() != null) {
-		     txL2 += "  " + labItem.getKuerzel();
+		     if (labItem.getLabItem().getKuerzel() != null) {
+		     txL2 += "  " + labItem.getLabItem().getKuerzel();
 		     }*/
 
 		    MinimaxValue minimaxValue = new MinimaxValue();
 		    minimaxValue.setName(
 			    group.getName() +
 				    ": " +
-				    labItem.getName() + txL2);
+				    labItem.getLabItem().getName() + txL2);
 
-		    CstAbstract cabstract = CstAbstract.getByLaboritemId(labItem.getId());
+		    CstAbstract cabstract = CstAbstract.getByLaboritemId(labItem.getLabItem().getId());
 		    if (cabstract != null) {
 			minimaxValue.setAbstract(cabstract.getDescription1());
 		    } else {
 			minimaxValue.setAbstract(Messages.Cst_Text_no_abstract_available);
 		    }
 
-		    double dResult[] = extractRefValues(labItem);
+		    double dResult[] = extractRefValues(labItem.getLabItem());
 
 		    minimaxValue.setRangeStart(dResult[0]);
 		    minimaxValue.setRangeEnd(dResult[1]);
 
-		    Date dateNow = new Date();
+		    if (!labItem.isDisplayOnce()) {
 
-		    Date dateBefore = CstService.getDateFromCompact(aProfile.getPeriod1DateStart());
-		    minimaxValue.setDateStartOfSpan1(dateBefore);
-		    minimaxValue.setDateEndOfSpan1(CstService.getDateFromCompact(aProfile.getPeriod1DateEnd()));
+			// TODO: is this correct?
+			Date dateNow = new Date();
 
-		    LabResult labResultMax1 = CstService.getMaxValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore, dateNow,
-			    labResults);
-		    if (labResultMax1 != null) {
-			minimaxValue.setMaxOfSpan1(CstService.getNumericFromLabResult(labResultMax1.getResult()));
-		    } else {
-			minimaxValue.setMaxOfSpan1(-1);
+			Date dateBefore = CstService.getDateFromCompact(aProfile.getPeriod1DateStart());
+			minimaxValue.setDateStartOfSpan1(dateBefore);
+			minimaxValue.setDateEndOfSpan1(CstService.getDateFromCompact(aProfile.getPeriod1DateEnd()));
+
+			LabResult labResultMax1 = CstService.getMaxValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore, dateNow,
+				labResults);
+			if (labResultMax1 != null) {
+			    minimaxValue.setMaxOfSpan1(CstService.getNumericFromLabResult(labResultMax1.getResult()));
+			} else {
+			    minimaxValue.setMaxOfSpan1(-1);
+			}
+
+			LabResult labResultMin1 = CstService.getMinValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore, dateNow,
+				labResults);
+			if (labResultMin1 != null) {
+			    minimaxValue.setMinOfSpan1(CstService.getNumericFromLabResult(labResultMin1.getResult()));
+			} else {
+			    minimaxValue.setMinOfSpan1(-1);
+			}
+
+			Date dateBefore2 = CstService.getDateFromCompact(aProfile.getPeriod2DateStart());
+			dateBefore = CstService.getDateFromCompact(aProfile.getPeriod2DateEnd());
+			minimaxValue.setDateStartOfSpan2(dateBefore2);
+			minimaxValue.setDateEndOfSpan2(dateBefore);
+
+			LabResult labResultMax2 = CstService.getMaxValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore2,
+				dateBefore, labResults);
+			if (labResultMax2 != null) {
+			    minimaxValue.setMaxOfSpan2(CstService.getNumericFromLabResult(labResultMax2.getResult()));
+			} else {
+			    minimaxValue.setMaxOfSpan2(-1);
+			}
+
+			LabResult labResultMin2 = CstService.getMinValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore2,
+				dateBefore, labResults);
+			if (labResultMin2 != null) {
+			    minimaxValue.setMinOfSpan2(CstService.getNumericFromLabResult(labResultMin2.getResult()));
+			} else {
+			    minimaxValue.setMinOfSpan2(-1);
+			}
+
+			Date dateBefore3 = CstService.getDateFromCompact(aProfile.getPeriod3DateStart());
+			dateBefore2 = CstService.getDateFromCompact(aProfile.getPeriod3DateEnd());
+			minimaxValue.setDateStartOfSpan3(dateBefore3);
+			minimaxValue.setDateEndOfSpan3(dateBefore2);
+
+			LabResult labResultMax3 = CstService.getMaxValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore3,
+				dateBefore2, labResults);
+			if (labResultMax3 != null) {
+			    minimaxValue.setMaxOfSpan3(CstService.getNumericFromLabResult(labResultMax3.getResult()));
+			} else {
+			    minimaxValue.setMaxOfSpan3(-1);
+			}
+
+			LabResult labResultMin3 = CstService.getMinValueForTimespan(labItem.getLabItem().getName(),
+				labItem.getLabItem().getKuerzel(), dateBefore3,
+				dateBefore2, labResults);
+			if (labResultMin3 != null) {
+			    minimaxValue.setMinOfSpan3(CstService.getNumericFromLabResult(labResultMin3.getResult()));
+			} else {
+			    minimaxValue.setMinOfSpan3(-1);
+			}
+
+			MinimaxCanvas minimaxCanvas = new MinimaxCanvas(lineCompo, SWT.BORDER);
+			minimaxCanvas.setFinding(minimaxValue);
+
 		    }
+		    else {
+			// TODO: can be done more beautifully
+			int countValues = 0;
+			for (String date : sortedDates) {
+			    LabResult labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
+				    date,
+				    labItem.getLabItem().getKuerzel(),
+				    labResults);
+			    if (labResultOnce != null) {
+				countValues++;
+			    }
 
-		    LabResult labResultMin1 = CstService.getMinValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore, dateNow,
-			    labResults);
-		    if (labResultMin1 != null) {
-			minimaxValue.setMinOfSpan1(CstService.getNumericFromLabResult(labResultMin1.getResult()));
-		    } else {
-			minimaxValue.setMinOfSpan1(-1);
+			}
+
+			LabResult labResultOnce = null;
+			Collections.reverse(sortedDates);
+			for (String date : sortedDates) {
+			    labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
+				    date,
+				    labItem.getLabItem().getKuerzel(),
+				    labResults);
+			    if (labResultOnce != null) {
+				break;
+			    }
+
+			}
+			DisplayOnceCanvas onceCAnvas = new DisplayOnceCanvas(lineCompo, SWT.BORDER);
+			onceCAnvas.setFinding(minimaxValue);
+
+			StringBuffer lblText = new StringBuffer(
+				"Dieser Laborwert wird nur einmal im Leben ermittelt\n\n");
+
+			if (labResultOnce == null) {
+			    lblText.append("Der Laborwert wurde noch nicht ermittelt.");
+			} else {
+			    if (countValues > 1) {
+				lblText.append("Der Laborwert wurde markiert als nur einmal zu ermitteln.\n");
+				lblText.append("Dennoch wurde mehr als ein Wert gefunden.\nDavon wird der neueste angezeigt:");
+
+			    }
+			}
+			minimaxValue.setText(lblText.toString());
+
+			if (labResultOnce != null) {
+
+			    minimaxValue.setMaxOfSpan3(new Double(CstService.getNumericFromLabResult(labResultOnce
+				    .getResult())));
+			} else {
+			    minimaxValue.setMaxOfSpan3(-1);
+
+			}
 		    }
-
-		    Date dateBefore2 = CstService.getDateFromCompact(aProfile.getPeriod2DateStart());
-		    dateBefore = CstService.getDateFromCompact(aProfile.getPeriod2DateEnd());
-		    minimaxValue.setDateStartOfSpan2(dateBefore2);
-		    minimaxValue.setDateEndOfSpan2(dateBefore);
-
-		    LabResult labResultMax2 = CstService.getMaxValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore2,
-			    dateBefore, labResults);
-		    if (labResultMax2 != null) {
-			minimaxValue.setMaxOfSpan2(CstService.getNumericFromLabResult(labResultMax2.getResult()));
-		    } else {
-			minimaxValue.setMaxOfSpan2(-1);
-		    }
-
-		    LabResult labResultMin2 = CstService.getMinValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore2,
-			    dateBefore, labResults);
-		    if (labResultMin2 != null) {
-			minimaxValue.setMinOfSpan2(CstService.getNumericFromLabResult(labResultMin2.getResult()));
-		    } else {
-			minimaxValue.setMinOfSpan2(-1);
-		    }
-
-		    Date dateBefore3 = CstService.getDateFromCompact(aProfile.getPeriod3DateStart());
-		    dateBefore2 = CstService.getDateFromCompact(aProfile.getPeriod3DateEnd());
-		    minimaxValue.setDateStartOfSpan3(dateBefore3);
-		    minimaxValue.setDateEndOfSpan3(dateBefore2);
-
-		    LabResult labResultMax3 = CstService.getMaxValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore3,
-			    dateBefore2, labResults);
-		    if (labResultMax3 != null) {
-			minimaxValue.setMaxOfSpan3(CstService.getNumericFromLabResult(labResultMax3.getResult()));
-		    } else {
-			minimaxValue.setMaxOfSpan3(-1);
-		    }
-
-		    LabResult labResultMin3 = CstService.getMinValueForTimespan(labItem.getName(),
-			    labItem.getKuerzel(), dateBefore3,
-			    dateBefore2, labResults);
-		    if (labResultMin3 != null) {
-			minimaxValue.setMinOfSpan3(CstService.getNumericFromLabResult(labResultMin3.getResult()));
-		    } else {
-			minimaxValue.setMinOfSpan3(-1);
-		    }
-
-		    MinimaxCanvas minimaxCanvas = new MinimaxCanvas(lineCompo, SWT.BORDER);
-		    minimaxCanvas.setFinding(minimaxValue);
 
 		    checkPageBreak(baseComposite);
 
-
 		} // end loop lab items
 	    } // end loop cst groups
-
-
 
 	    baseComposite.pack();
 	    int currentHeigth = baseComposite.getSize().y;
@@ -252,8 +306,6 @@ public class CstResultMiniMax extends CstResultPart {
 	}
 
     }
-
-
 
     @Override
     public void visible(boolean mode) {

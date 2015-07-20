@@ -1360,15 +1360,16 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		if (dialog.open() == Window.OK) {
 
 		    //CstProfile.getByNameAndPatientAndMandant(dialog.getName(), kontaktId, mandantId)
+		    /*
 		    CstProfile existProf = CstProfile.getByNameAndPatientAndMandant(dialog.getName(), patient.getId(),
-			    CoreHub.actMandant.getId());
+		        CoreHub.actMandant.getId());
 
 		    //if (existProf != null && !profile.getId().equals(existProf.getId())) {
 		    if (existProf != null) {
 
-			showMessage(Messages.Cst_Text_cstprofile_exists);
-			return;
-		    }
+		    showMessage(Messages.Cst_Text_cstprofile_exists);
+		    return;
+		    }*/
 		    profile.setName(dialog.getName());
 		    profile.setDescription(dialog.getDescription());
 		    profile.setValidFrom(dialog.getValidFrom());
