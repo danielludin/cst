@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.ui.UiDesk;
 import ch.gpb.elexis.cst.data.MinimaxValue;
-import ch.gpb.elexis.cst.service.CstService;
 
 /**
  * 
@@ -30,7 +29,7 @@ import ch.gpb.elexis.cst.service.CstService;
  *	Custom Canvas for the Display of Min/Max Lab Values
  *
  */
-public class DisplayOnceCanvas extends CstCanvas {
+public class NoValuesCanvas extends CstCanvas {
 
     int iPixX = 774; // Anzeigebreite in pix
     int iPixY = 140; // Anzeigehöhe in pix
@@ -40,7 +39,7 @@ public class DisplayOnceCanvas extends CstCanvas {
 
     MinimaxValue finding = new MinimaxValue();
 
-    public DisplayOnceCanvas(Composite parent, int style) {
+    public NoValuesCanvas(Composite parent, int style) {
 	super(parent, style);
 
 	setBackground(WHITE);
@@ -49,7 +48,7 @@ public class DisplayOnceCanvas extends CstCanvas {
 
 	addPaintListener(new PaintListener() {
 	    public void paintControl(PaintEvent e) {
-		DisplayOnceCanvas.this.paintControl(e);
+		NoValuesCanvas.this.paintControl(e);
 	    }
 	});
     }
@@ -85,6 +84,7 @@ public class DisplayOnceCanvas extends CstCanvas {
 	gc.drawLine(xOff4, 0, xOff4, iPixY);
 
 	StringBuffer title = new StringBuffer(finding.getName());
+	/*
 	if (finding.getRangeStart() > 0 && finding.getRangeEnd() > 0) {
 
 	    title.append(" (");
@@ -96,15 +96,16 @@ public class DisplayOnceCanvas extends CstCanvas {
 	    title.append(" (keine Ref.Werte)");
 	}
 
+	 */
 	gc.drawText(title.toString(), xOff1, 2, true);
 
 	gc.setFont(fontSmall);
 	gc.setForeground(BLUE);
-
 	String sTxt1 = finding.getText();
 
 	gc.drawText(sTxt1, xOff1 + 10, 30);
 
+	/*
 	if (finding.getMaxOfSpan3() == -1) {
 	    gc.drawText("Resultat:\t keine Werte",
 		    xOff1 + 10, 100, true);
@@ -116,7 +117,7 @@ public class DisplayOnceCanvas extends CstCanvas {
 			    + CstService.getGermanFromDate(finding.getDateStartOfSpan3()),
 		    xOff1 + 10, 100, true);
 	}
-
+	*/
 	gc.setForeground(BLACK);
 
 	final TextLayout layout = new TextLayout(getDisplay());

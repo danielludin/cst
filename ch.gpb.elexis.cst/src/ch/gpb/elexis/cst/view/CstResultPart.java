@@ -387,6 +387,26 @@ public abstract class CstResultPart extends ViewPart implements IActivationListe
 
     }
 
+    protected void addNoValuesLabel(Composite composite) {
+	StringBuffer lblText = new StringBuffer(
+		Messages.CstResultEffektiv_hinweis_keine_werte);
+	Label lblNoValues = new Label(composite, SWT.NONE);
+	GridData gdNoValues = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+	gdNoValues.grabExcessHorizontalSpace = true;
+	gdNoValues.horizontalAlignment = SWT.FILL;
+
+	if (profile.getAusgabeRichtung()) {
+	    gdNoValues.widthHint = 858;
+	} else {
+	    gdNoValues.widthHint = 530;
+	}
+	lblNoValues.setLayoutData(gdNoValues);
+	lblNoValues.setText(lblText.toString());
+	lblNoValues.setForeground(RED);
+	lblNoValues.setBackground(WHITE);
+
+    }
+
     /**
      * The findings display is always the same for all display modes,
      * call this method to add them to your custom display class

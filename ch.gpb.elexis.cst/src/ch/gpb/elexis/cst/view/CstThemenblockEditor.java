@@ -815,9 +815,7 @@ public class CstThemenblockEditor extends ViewPart implements
 	actionDisplayOnce.setText("Immer anzeigen");
 	actionDisplayOnce
 		.setToolTipText(Messages.Cst_Text_delete_from_cstgroup_tooltip);
-	actionDisplayOnce.setImageDescriptor(PlatformUI.getWorkbench()
-		.getSharedImages()
-		.getImageDescriptor(ISharedImages.IMG_TOOL_UP));
+	actionDisplayOnce.setImageDescriptor(Activator.getImageDescriptor(Activator.IMG_DISPLAYONCE_PATH));
 
 	actionAddLabItems = new Action() {
 	    public void run() {

@@ -190,6 +190,10 @@ public class Messages extends NLS {
     public static String RemindersComposite_lblHeart_text;
     public static String RemindersComposite_lblCheckingForActions_text;
     public static String AnzeigeOptionsComposite_lblWoSindMeine_text;
+    public static String CstResultEffektiv_hinweis_einmal_im_leben;
+    public static String CstResultEffektiv_hinweis_keine_werte;
+    public static String CstResultEffektiv_resultat_nie_ermittelt;
+    public static String CstResultEffktiv_hinweis_immer_anzeigen;
     //public static String TemplateComposite_text_text;
 
     static {

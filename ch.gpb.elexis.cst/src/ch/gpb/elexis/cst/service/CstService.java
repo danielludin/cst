@@ -538,7 +538,71 @@ public class CstService {
 				labResult.getItem().getName().equals(kuerzel) ||
 				labResult.getItem().getKuerzel().equals(name)) &&
 				labResult.getDate().equals(CstService.getGermanFromCompact(date))) {
+			    /*
+			    if ((labResult.getItem().getName().equals(name) ||
+			    labResult.getItem().getKuerzel().equals(kuerzel)) &&
+			    labResult.getDate().equals(CstService.getGermanFromCompact(date))) {
+
+			    */
 			    result = labResult;
+			    /*
+			    log.debug("HIT: " + result.getItem().getName() + " \tDate: " + result.getDate(),
+			        Log.DEBUGMSG);
+			     */
+			    break;
+			}
+
+		    }
+
+		}
+
+	    }
+	}
+
+	return result;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public static boolean hasValueForName(
+	    String name,
+	    String kuerzel,
+	    HashMap<String, HashMap<String, HashMap<String, List<LabResult>>>> labResults) {
+
+	//log.debug("********** name/date: " + name + "/" + date);
+	boolean result = false;
+	Set<String> keys1 = labResults.keySet();
+
+	// iterate over groups  (typically Medics Labor, Eigenlabor, Sysmex Labor etc.)
+	for (String sKey : keys1) {
+	    //log.debug("key1: " + sKey);
+	    HashMap<String, ?> hm2 = labResults.get(sKey);
+	    Set<String> keys2 = hm2.keySet();
+
+	    // sKey2 is the LabItem name
+	    for (String sKey2 : keys2) {
+
+		HashMap<String, ?> hm3 = (HashMap<String, ?>) hm2.get(sKey2);
+		Set<String> keys3 = hm3.keySet(); // contains the dates, ie: [20140207, 20121016, 20140904, 20130912, 20120302, 20150408]
+		for (String sKey3 : keys3) {
+		    Object obj = hm3.get(sKey3);
+		    List<LabResult> res = (List<LabResult>) obj;
+
+		    for (LabResult labResult : res) {
+
+			// TODO: this lengthy condition is required, because sometimes the
+			// Labitems seem to be intermixed (ie HGB / Hämoglobin and LDH / LDH Elektrophorese)
+			if (labResult.getItem().getName().equals(name) ||
+				labResult.getItem().getKuerzel().equals(kuerzel) ||
+				labResult.getItem().getName().equals(kuerzel) ||
+				labResult.getItem().getKuerzel().equals(name)) {
+			    /*
+			    if ((labResult.getItem().getName().equals(name) ||
+			    labResult.getItem().getKuerzel().equals(kuerzel)) &&
+			    labResult.getDate().equals(CstService.getGermanFromCompact(date))) {
+
+			    */
+			    result = true;
 			    /*
 			    log.debug("HIT: " + result.getItem().getName() + " \tDate: " + result.getDate(),
 			        Log.DEBUGMSG);
@@ -768,11 +832,11 @@ public class CstService {
 
 		    for (LabResult labResult : res) {
 			//log.info("\t\t\t\tP: lab result: " + labResult, Log.INFOS);
-			/*
+
 			log.info("\t\t\t\tP: lab result: " + labResult.getDate() + " Name: "
 				+ labResult.getItem().getName() + " Kuerzel: " + labResult.getItem().getKuerzel()
 				+ "\tResult: " + labResult.getResult(), Log.INFOS);
-			*/
+
 		    }
 
 		}

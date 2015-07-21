@@ -79,6 +79,8 @@ public class CstResultEffektiv extends CstResultPart {
 	    HashMap<String, HashMap<String, HashMap<String, List<LabResult>>>> labResults = LabResult
 		    .getGrouped(patient);
 
+	    //CstService.printLaborwerte(labResults);
+
 	    // the bottom most entry is the newest date
 	    List<String> sortedDates = CstService.getDistinctDates(labResults);
 
@@ -189,256 +191,278 @@ public class CstResultEffektiv extends CstResultPart {
 
 		    newHeigth += (lineCompo.getSize().y);
 
-		    if (!labItem.isDisplayOnce()) {
-
-			// neuestes Datum aus der Liste der in den LabResults vorhandenen Daten holen
-			String sDateOfLatestLabresult = sortedDates.get(sortedDates.size() - 1);
-			log.info(
-				"Searching result for date:  " + sDateOfLatestLabresult + "\tLabitem: "
-					+ labItem.getLabItem().getName()
-					+ "\tPat.ID:"
-					+ aProfile.getKontaktId(),
-				Log.INFOS);
-
-			// Algorithm of Lab Result selection:
-			// If the Crawlback is set to 0, we take the newest date from the dates with labresults,
-			// an use this date for the DangerRangeCanvas even if there is no result on this date and labitem.
-			// The dates before this latest date are used for VorwertCanvas as far as crawlback goes back.
-			// 
-			// If the Crawlback is greater than 0, we take the first date that has a Labresult for the
-			// DangerRangeCanvas, and the remaining Labresults for the VorwertCanvas as far as crawlback goes back.s
-
-			LabResult labResultLatest = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
-				sDateOfLatestLabresult,
-				labItem.getLabItem().getKuerzel(),
-				labResults);
-
-			ArrayList<String> datesForVorwert = new ArrayList<String>(sortedDates);
-
-			// if the crawlback is not set to 0, we search for the next date before 
-			// containing a result
-			// else we leave the result for DangerRangeCanvas on the latest lab date, which is zero,
-			// and provide all dates except the newest for the Findings loop of VorwertCanvas
-
-			if (aProfile.getCrawlBack() > 0) {
-
-			    String sNewestDate = sortedDates.get(sortedDates.size() - 1);
-
-			    if (labResultLatest == null) {
-
-				for (int i = sortedDates.size() - 1; i >= 0; i--) {
-
-				    // starts with bottom most date (= newest)
-				    String sDateAtIndex = sortedDates.get(i);
-
-				    datesForVorwert.remove(i);
-
-				    long daysBetween = CstService.getDayCountFromCompact(sDateAtIndex,
-					    sNewestDate);
-				    long crawlBack = aProfile.getCrawlBack();
-
-				    if (daysBetween > crawlBack) {
-					// the date where the crawlback interrupts marks the date (and all newer dates)
-					// that must be removed from the date list for the findings loop that gets values
-					// for the vorwertcanvas.
-
-					break;
-				    }
-
-				    LabResult labResultIndex = CstService.getValueForNameAndDate(labItem.getLabItem()
-					    .getName(),
-					    sDateAtIndex, labItem.getLabItem().getKuerzel(), labResults);
-
-				    if (labResultIndex != null) {
-					labResultLatest = labResultIndex;
-					sDateOfLatestLabresult = sDateAtIndex;
-					break;
-				    }
-				}
-			    }
-			    else {
-				// there is a value already on the newest date, so we remove this from the date list
-				datesForVorwert.remove(datesForVorwert.size() - 1);
-
-			    }
-			} else {
-			    datesForVorwert.remove(datesForVorwert.size() - 1);
-			}
-
-			// Formatting the Ref values
-			double[] dRanges = extractRefValues(labItem.getLabItem());
-			double dRangeStart = dRanges[0];
-			double dRangeEnd = dRanges[1];
-
-			// Formatting the Result values
-			String sResult = "";
-
-			try {
-			    if (labResultLatest != null && labResultLatest.getResult() != null) {
-				sResult = labResultLatest.getResult();
-				System.out.println("raw result: " + sResult);
-			    }
-			} catch (Exception e1) {
-			    log.info(
-				    "Error opening result view: " + e1.getMessage() + " "
-					    + labItem.getLabItem().getName(),
-				    Log.INFOS);
-			}
-
-			double dResult = -1;
-
-			dResult = CstService.getNumericFromLabResult(sResult);
-
-			// Fetch the LabResults for the Vorwert Graphic
-			List<ValueFinding> findings = new ArrayList<ValueFinding>();
-
-			Collections.reverse(datesForVorwert);
-
-			for (String fDate : datesForVorwert) {
-
-			    Date dateResult = CstService.getDateFromCompact(fDate);
-			    Date startDateProfile = CstService.getDateFromCompact(profile.getValidFrom());
-			    if (dateResult.compareTo(startDateProfile) < 0) {
-				continue;
-			    }
-
-			    LabResult resultVorwert = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
-				    fDate,
-				    labItem.getLabItem().getKuerzel(),
-				    labResults);
-
-			    // might be null, not every date has a value
-			    if (resultVorwert == null) {
-				//log.info("No LabResult for: " + labItem.getName() + "/" + fDate, Log.INFOS);
-				continue;
-
-			    }
-
-			    String sResultV = null;
-
-			    try {
-				sResultV = resultVorwert.getResult();
-			    } catch (Exception e) {
-				log.error("Error getting result effektiv: " + e.getMessage(), Log.ERRORS);
-				continue;
-			    }
-
-			    double dResultV = 0;
-			    dResultV = CstService.getNumericFromLabResult(sResultV);
-
-			    ValueFinding f = new ValueFinding();
-			    if (patient.getGeschlecht().toLowerCase().equals("m")) {
-				f.setRefMstart(dRangeStart);
-				f.setRefMend(dRangeEnd);
-				f.setRefFstart(0);
-				f.setRefFend(0);
-			    } else {
-				f.setRefFstart(dRangeStart);
-				f.setRefFend(dRangeEnd);
-				f.setRefMstart(0);
-				f.setRefMend(0);
-
-			    }
-
-			    f.setValue(dResultV);
-			    f.setDateOfFinding(CstService.getDateFromCompact(fDate));
-			    f.setParam(sResultV);
-			    findings.add(f);
-
-			}
-
-			CstVorwertCanvas vCanvas = new CstVorwertCanvas(
-				leftCompo, profile.getAusgabeRichtung(),
-				SWT.NONE);
-			vCanvas.setFindings(findings);
-			GridLayout vorwertLayout = new GridLayout();
-			vCanvas.setLayout(vorwertLayout);
-			GridData vorwertData = new GridData();
-			vorwertData.horizontalAlignment = GridData.FILL;
-			vorwertData.grabExcessHorizontalSpace = true;
-			vCanvas.setLayoutData(vorwertData);
-
-			if (dResult == -1) {
-			    //Label label = new Label(rightCompo, SWT.NONE);
-			    Label label = new Label(leftCompo, SWT.NONE);
-			    label.setText("No result for Lab Item " + labItem.getLabItem().getName() + " on "
-				    + CstService.getGermanFromCompact(sDateOfLatestLabresult));
-			    GridData gdLabelNoValue = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
-			    label.setLayoutData(gdLabelNoValue);
-			} else {
-
-			    CstDangerRangeCanvas drc2 = new CstDangerRangeCanvas(
-				    leftCompo,
-				    profile.getAusgabeRichtung(), SWT.NONE,
-				    dRangeStart,
-				    dRangeEnd, dResult, sResult, labItem.getLabItem().getName(),
-				    CstService.getGermanFromCompact(sDateOfLatestLabresult));
-			    GridLayout drcLayout = new GridLayout();
-			    GridData drcData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
-			    drcData.verticalIndent = 30;
-			    drcData.horizontalAlignment = SWT.BEGINNING;
-			    drc2.setLayout(drcLayout);
-			    drc2.setLayoutData(drcData);
-
-			}
+		    if (!CstService.hasValueForName(labItem.getLabItem().getName(), labItem.getLabItem().getKuerzel(),
+			    labResults)) {
+			// No Values Label
+			addNoValuesLabel(leftCompo);
 
 		    } else {
-			StringBuffer lblText = new StringBuffer(
-				"Dieser Laborwert wird nur einmal im Leben ermittelt\n\n");
-			Label lblDisplayOnce = new Label(leftCompo, SWT.BORDER);
-			GridData gdDisplayOnce = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-			gdDisplayOnce.grabExcessHorizontalSpace = true;
-			gdDisplayOnce.horizontalAlignment = SWT.FILL;
 
-			if (aProfile.getAusgabeRichtung()) {
-			    gdDisplayOnce.widthHint = 855;
-			} else {
-			    gdDisplayOnce.widthHint = 530;
-			}
-			lblDisplayOnce.setLayoutData(gdDisplayOnce);
+			if (!labItem.isDisplayOnce()) {
 
-			int countValues = 0;
-			for (String date : sortedDates) {
-			    LabResult labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
-				    date,
+			    // neuestes Datum aus der Liste der in den LabResults vorhandenen Daten holen
+			    String sDateOfLatestLabresult = sortedDates.get(sortedDates.size() - 1);
+			    log.info(
+				    "Searching result for date:  " + sDateOfLatestLabresult + "\tLabitem: "
+					    + labItem.getLabItem().getName()
+					    + "\tPat.ID:"
+					    + aProfile.getKontaktId(),
+				    Log.INFOS);
+
+			    // Algorithm of Lab Result selection:
+			    // If the Crawlback is set to 0, we take the newest date from the dates with labresults,
+			    // an use this date for the DangerRangeCanvas even if there is no result on this date and labitem.
+			    // The dates before this latest date are used for VorwertCanvas as far as crawlback goes back.
+			    // 
+			    // If the Crawlback is greater than 0, we take the first date that has a Labresult for the
+			    // DangerRangeCanvas, and the remaining Labresults for the VorwertCanvas as far as crawlback goes back.s
+
+			    LabResult labResultLatest = CstService.getValueForNameAndDate(labItem.getLabItem()
+				    .getName(),
+				    sDateOfLatestLabresult,
 				    labItem.getLabItem().getKuerzel(),
 				    labResults);
-			    if (labResultOnce != null) {
-				countValues++;
+
+			    ArrayList<String> datesForVorwert = new ArrayList<String>(sortedDates);
+
+			    // if the crawlback is not set to 0, we search for the next date before 
+			    // containing a result
+			    // else we leave the result for DangerRangeCanvas on the latest lab date, which is zero,
+			    // and provide all dates except the newest for the Findings loop of VorwertCanvas
+
+			    if (aProfile.getCrawlBack() > 0) {
+
+				String sNewestDate = sortedDates.get(sortedDates.size() - 1);
+
+				if (labResultLatest == null) {
+
+				    for (int i = sortedDates.size() - 1; i >= 0; i--) {
+
+					// starts with bottom most date (= newest)
+					String sDateAtIndex = sortedDates.get(i);
+
+					datesForVorwert.remove(i);
+
+					long daysBetween = CstService.getDayCountFromCompact(sDateAtIndex,
+						sNewestDate);
+					long crawlBack = aProfile.getCrawlBack();
+
+					if (daysBetween > crawlBack) {
+					    // the date where the crawlback interrupts marks the date (and all newer dates)
+					    // that must be removed from the date list for the findings loop that gets values
+					    // for the vorwertcanvas.
+
+					    break;
+					}
+
+					LabResult labResultIndex = CstService.getValueForNameAndDate(labItem
+						.getLabItem()
+						.getName(),
+						sDateAtIndex, labItem.getLabItem().getKuerzel(), labResults);
+
+					if (labResultIndex != null) {
+					    labResultLatest = labResultIndex;
+					    sDateOfLatestLabresult = sDateAtIndex;
+					    break;
+					}
+				    }
+				}
+				else {
+				    // there is a value already on the newest date, so we remove this from the date list
+				    datesForVorwert.remove(datesForVorwert.size() - 1);
+
+				}
+			    } else {
+				datesForVorwert.remove(datesForVorwert.size() - 1);
 			    }
 
-			}
+			    // Formatting the Ref values
+			    double[] dRanges = extractRefValues(labItem.getLabItem());
+			    double dRangeStart = dRanges[0];
+			    double dRangeEnd = dRanges[1];
 
-			LabResult labResultOnce = null;
-			Collections.reverse(sortedDates);
-			for (String date : sortedDates) {
-			    labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
-				    date,
-				    labItem.getLabItem().getKuerzel(),
-				    labResults);
-			    if (labResultOnce != null) {
-				break;
+			    // Formatting the Result values
+			    String sResult = "";
+
+			    try {
+				if (labResultLatest != null && labResultLatest.getResult() != null) {
+				    sResult = labResultLatest.getResult();
+				    System.out.println("raw result: " + sResult);
+				}
+			    } catch (Exception e1) {
+				log.info(
+					"Error opening result view: " + e1.getMessage() + " "
+						+ labItem.getLabItem().getName(),
+					Log.INFOS);
 			    }
 
-			}
+			    double dResult = -1;
 
-			if (labResultOnce == null) {
-			    lblText.append("Der Laborwert wurde noch nicht ermittelt.");
+			    dResult = CstService.getNumericFromLabResult(sResult);
+
+			    // Fetch the LabResults for the Vorwert Graphic
+			    List<ValueFinding> findings = new ArrayList<ValueFinding>();
+
+			    Collections.reverse(datesForVorwert);
+
+			    for (String fDate : datesForVorwert) {
+
+				Date dateResult = CstService.getDateFromCompact(fDate);
+				Date startDateProfile = CstService.getDateFromCompact(profile.getValidFrom());
+				if (dateResult.compareTo(startDateProfile) < 0) {
+				    continue;
+				}
+
+				LabResult resultVorwert = CstService.getValueForNameAndDate(labItem.getLabItem()
+					.getName(),
+					fDate,
+					labItem.getLabItem().getKuerzel(),
+					labResults);
+
+				// might be null, not every date has a value
+				if (resultVorwert == null) {
+				    //log.info("No LabResult for: " + labItem.getName() + "/" + fDate, Log.INFOS);
+				    continue;
+
+				}
+
+				String sResultV = null;
+
+				try {
+				    sResultV = resultVorwert.getResult();
+				} catch (Exception e) {
+				    log.error("Error getting result effektiv: " + e.getMessage(), Log.ERRORS);
+				    continue;
+				}
+
+				double dResultV = 0;
+				dResultV = CstService.getNumericFromLabResult(sResultV);
+
+				ValueFinding f = new ValueFinding();
+				if (patient.getGeschlecht().toLowerCase().equals("m")) {
+				    f.setRefMstart(dRangeStart);
+				    f.setRefMend(dRangeEnd);
+				    f.setRefFstart(0);
+				    f.setRefFend(0);
+				} else {
+				    f.setRefFstart(dRangeStart);
+				    f.setRefFend(dRangeEnd);
+				    f.setRefMstart(0);
+				    f.setRefMend(0);
+
+				}
+
+				f.setValue(dResultV);
+				f.setDateOfFinding(CstService.getDateFromCompact(fDate));
+				f.setParam(sResultV);
+				findings.add(f);
+
+			    }
+
+			    CstVorwertCanvas vCanvas = new CstVorwertCanvas(
+				    leftCompo, profile.getAusgabeRichtung(),
+				    SWT.NONE);
+			    vCanvas.setFindings(findings);
+			    GridLayout vorwertLayout = new GridLayout();
+			    vCanvas.setLayout(vorwertLayout);
+			    GridData vorwertData = new GridData();
+			    vorwertData.horizontalAlignment = GridData.FILL;
+			    vorwertData.grabExcessHorizontalSpace = true;
+			    vCanvas.setLayoutData(vorwertData);
+
+			    if (dResult == -1) {
+				//Label label = new Label(rightCompo, SWT.NONE);
+				Label label = new Label(leftCompo, SWT.NONE);
+				label.setText("No result for Lab Item " + labItem.getLabItem().getName() + " on "
+					+ CstService.getGermanFromCompact(sDateOfLatestLabresult));
+				GridData gdLabelNoValue = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
+				label.setLayoutData(gdLabelNoValue);
+			    } else {
+
+				CstDangerRangeCanvas drc2 = new CstDangerRangeCanvas(
+					leftCompo,
+					profile.getAusgabeRichtung(), SWT.NONE,
+					dRangeStart,
+					dRangeEnd, dResult, sResult, labItem.getLabItem().getName(),
+					CstService.getGermanFromCompact(sDateOfLatestLabresult));
+				GridLayout drcLayout = new GridLayout();
+				GridData drcData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
+				drcData.verticalIndent = 30;
+				drcData.horizontalAlignment = SWT.BEGINNING;
+				drc2.setLayout(drcLayout);
+				drc2.setLayoutData(drcData);
+
+			    }
+
 			} else {
-			    if (countValues > 1) {
-				lblText.append("Der Laborwert wurde markiert als nur einmal zu ermitteln.\n");
-				lblText.append("Dennoch wurde mehr als ein Wert gefunden.\nDavon wird der neueste angezeigt:");
+
+			    // Display Once Label
+			    StringBuffer lblText = new StringBuffer(
+				    Messages.CstResultEffektiv_hinweis_einmal_im_leben);
+			    Label lblDisplayOnce = new Label(leftCompo, SWT.NONE);
+			    GridData gdDisplayOnce = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+			    gdDisplayOnce.grabExcessHorizontalSpace = true;
+			    gdDisplayOnce.horizontalAlignment = SWT.FILL;
+			    gdDisplayOnce.verticalAlignment = SWT.TOP;
+			    if (aProfile.getAusgabeRichtung()) {
+				gdDisplayOnce.widthHint = 858;
+			    } else {
+				gdDisplayOnce.widthHint = 530;
+			    }
+			    lblDisplayOnce.setLayoutData(gdDisplayOnce);
+			    lblDisplayOnce.setBackground(WHITE);
+
+			    int countValues = 0;
+			    for (String date : sortedDates) {
+				LabResult labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem()
+					.getName(),
+					date,
+					labItem.getLabItem().getKuerzel(),
+					labResults);
+				if (labResultOnce != null) {
+				    countValues++;
+				}
 
 			    }
-			    lblText.append("\n\n");
-			    lblText.append("Resultat:\t");
-			    lblText.append(labResultOnce.getResult());
-			    lblText.append("\nDatum:\t");
-			    lblText.append(labResultOnce.getDate());
+
+			    LabResult labResultOnce = null;
+			    Collections.reverse(sortedDates);
+			    for (String date : sortedDates) {
+				labResultOnce = CstService.getValueForNameAndDate(labItem.getLabItem().getName(),
+					date,
+					labItem.getLabItem().getKuerzel(),
+					labResults);
+				if (labResultOnce != null) {
+				    break;
+				}
+
+			    }
+
+			    if (labResultOnce == null) {
+				lblText.append(Messages.CstResultEffektiv_resultat_nie_ermittelt);
+			    } else {
+				if (countValues > 1) {
+				    lblText.append(Messages.CstResultEffktiv_hinweis_immer_anzeigen);
+
+				}
+				lblText.append("\n\n");
+				lblText.append("Resultat:\t\t");
+				lblText.append(labResultOnce.getResult());
+				lblText.append("\nDatum:\t\t");
+				lblText.append(labResultOnce.getDate());
+				lblText.append("\nReferenz:\t");
+				if (patient.getGeschlecht().toLowerCase().equals("m")) {
+				    lblText.append(labItem.getLabItem().getRefM());
+				} else {
+				    lblText.append(labItem.getLabItem().getRefW());
+
+				}
+
+			    }
+
+			    lblDisplayOnce.setText(lblText.toString());
+
 			}
-
-			lblDisplayOnce.setText(lblText.toString());
-
 		    }
 		    //----
 

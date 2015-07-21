@@ -220,7 +220,7 @@ public class CstGroup extends PersistentObject {
 
 	    //ret.add(new LabItem.load(r[0]));
 	    ret.add(new LabItemWrapper(LabItem.load(r[0]), r[1]));
-	    System.out.println("DisplayOnce;" + r[1]);
+	    //System.out.println("DisplayOnce;" + r[1]);
 	}
 	return ret;
     }
