@@ -84,6 +84,9 @@ public class Activator extends AbstractUIPlugin {
     public static final String IMG_DISPLAYONCE_NAME = "displayonce.png";
     public static final String IMG_DISPLAYONCE_PATH = "icons/displayonce.png";
 
+    public static final String IMG_TEST_NAME = "hohe-view-50000h.png";
+    public static final String IMG_TEST_PATH = "icons/hohe-view-50000h.png";
+
     // The plug-in ID png-icon-32
     public static final String PLUGIN_ID = "ch.gpb.elexis.cst"; //$NON-NLS-1$
 
@@ -129,6 +132,8 @@ public class Activator extends AbstractUIPlugin {
 	UiDesk.getImageRegistry().put(IMG_HEART_E_NAME, Activator.getImageDescriptor(IMG_HEART_E_PATH));
 	UiDesk.getImageRegistry().put(IMG_EXCLAM_NAME, Activator.getImageDescriptor(IMG_EXCLAM_PATH));
 	UiDesk.getImageRegistry().put(IMG_DISPLAYONCE_NAME, Activator.getImageDescriptor(IMG_DISPLAYONCE_PATH));
+
+	UiDesk.getImageRegistry().put(IMG_TEST_NAME, Activator.getImageDescriptor(IMG_TEST_PATH));
     }
 
     /*

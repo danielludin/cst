@@ -112,6 +112,8 @@ import ch.gpb.elexis.cst.view.profileeditor.ProImmunComposite;
 import ch.gpb.elexis.cst.view.profileeditor.RemindersComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TemplateComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TherapieVorschlagComposite;
+import ch.gpb.elexis.cst.widget.ResultatPartEffektiv;
+import ch.gpb.elexis.cst.widget.ResultatPartMinimax;
 
 /**
  * 
@@ -284,7 +286,13 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	    public void handleEvent(Event e) {
 		switch (e.type) {
 		case SWT.Selection:
-		    showResultPage();
+
+		    if ((e.stateMask & SWT.CTRL) == SWT.CTRL) {
+			showResultPageNew();
+		    } else {
+			showResultPage();
+		    }
+
 		    break;
 		}
 	    }
@@ -334,10 +342,12 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
 
 	// Tabitem REminders
+	/*
 	CTabItem ci13 = new CTabItem(ctabs, SWT.NONE);
 	ci13.setText("Reminders");
 	stateComposite = new RemindersComposite(ctabs);
 	ci13.setControl(stateComposite);
+	*/
 
 	// Tabitem Hilfe
 	CTabItem ci11 = new CTabItem(ctabs, SWT.NONE);
@@ -626,6 +636,69 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
     }
 
+    private void showResultPageNew() {
+
+	// TODO create Constants for the view IDs
+
+	TableItem[] selItemC = tableProfile.getSelection();
+
+	if (selItemC.length == 0) {
+	    showMessage(Messages.Cst_Text_Bitte_Profil_auswaehlen);
+	    return;
+	}
+
+	CstProfile selProfile = (CstProfile) selItemC[0].getData();
+
+	if (selProfile.getCstGroups().size() == 0) {
+	    MessageBox dialog =
+		    new MessageBox(UiDesk.getTopShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+	    dialog.setText(Messages.Cst_Text_profil_unvollstaendig);
+	    dialog.setMessage(Messages.Cst_Text_profil_hat_keine_gruppen);
+
+	    // open dialog and await user selection
+	    int returnCode = dialog.open();
+	    if (returnCode == SWT.CANCEL) {
+		return;
+	    }
+
+	}
+
+	try {
+	    if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_EFFEKTIV)) {
+		ResultatPartEffektiv viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow()
+			.getActivePage().findView("ch.gpb.elexis.cst.resultateffektiv");
+		if (viewer == null) {
+		    viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+			    .getActivePage()
+			    .showView("ch.gpb.elexis.cst.resultateffektiv");
+		}
+		viewer.setProfile(selProfile);
+		viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+			.showView("ch.gpb.elexis.cst.resultateffektiv");
+
+	    }
+
+	    if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_MINIMAX)) {
+		ResultatPartMinimax viewer = (ResultatPartMinimax) PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow()
+			.getActivePage().findView("ch.gpb.elexis.cst.resultatminimax");
+		if (viewer == null) {
+		    viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+			    .getActivePage()
+			    .showView("ch.gpb.elexis.cst.resultatminimax");
+		}
+		viewer.setProfile(selProfile);
+		viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+			.showView("ch.gpb.elexis.cst.resultatminimax");
+
+	    }
+
+	} catch (PartInitException e) {
+	    log.info("Error opening result view: " + e.getMessage(), Log.INFOS);
+	}
+
+    }
     private void showResultPage() {
 
 	// TODO create Constants for the view IDs
@@ -1602,7 +1675,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
 		Object ranking = itemRanking.get(labItem.getId());
 		if (ranking == null) {
-		    showMessage("Error with Ranking. Reinitializing...");
+		    //showMessage("Error with Ranking. Reinitializing...");
 		    reinitRanking(getSelectedProfile());
 		}
 
@@ -1684,13 +1757,14 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		    ElexisEvent.EVENT_SELECTED));
 
 	    //stateComposite.add
-	    CoreHub.heart.addListener(stateComposite);
+	    //CoreHub.heart.addListener(stateComposite);
 	    //System.out.println("Hearbeat Listener added");
-	    stateComposite.heartbeat();
+	    //stateComposite.heartbeat();
 
 	} else {
 	    ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
-	    CoreHub.heart.removeListener(stateComposite);
+
+	    //CoreHub.heart.removeListener(stateComposite);
 	    //System.out.println("Hearbeat Listener removed");
 
 	}

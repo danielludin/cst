@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,8 +27,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.LabResult;
+import ch.gpb.elexis.cst.Activator;
 import ch.gpb.elexis.cst.data.CstAbstract;
 import ch.gpb.elexis.cst.data.CstGroup;
 import ch.gpb.elexis.cst.data.CstProfile;
@@ -56,7 +59,39 @@ public class CstResultEffektiv extends CstResultPart {
     public static final String ID = "ch.gpb.elexis.cst.cstresultminimax";
     private int printHeigth = OUTPUTHEIGTH;
 
-    @Override
+    //@Override
+    public void layoutDisplayTest(CstProfile aProfile) {
+	int heigth = 20000;
+	Image pointer = UiDesk.getImage(Activator.IMG_TEST_NAME);
+
+
+	baseComposite.setSize(OUTPUTWIDTH, heigth);
+	baseComposite.setBounds(new Rectangle(0, 0, OUTPUTWIDTH, heigth));
+	baseComposite.layout();
+
+	for (Control control : baseComposite.getChildren()) {
+	    control.dispose();
+	}
+
+	//ResultatCanvasEffektiv rCanvas = new ResultatCanvasEffektiv(baseComposite, SWT.NONE, aProfile);
+
+	Label test = new Label(baseComposite, SWT.NONE);
+	test.setImage(pointer);
+
+	/*
+	GridData gdCanvas = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+	rCanvas.setLayoutData(gdCanvas);
+	rCanvas.setSize(794, heigth);
+	rCanvas.setBackground(WHITE);
+	*/
+	baseComposite.layout();
+	/*
+	rCanvas.redraw();
+	*/
+
+    }
+
+    //@Override
     public void layoutDisplay(CstProfile aProfile) {
 	if (aProfile != null) {
 

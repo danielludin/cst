@@ -43,6 +43,24 @@
             name="CST Auswertung Minimal / Maximal"
             restorable="true">
       </view>
+    <view
+            allowMultiple="false"
+            category="ch.gpb.elexis.cst"
+            class="ch.gpb.elexis.cst.widget.ResultatPartEffektiv"
+            icon="icons/icon-cat-3-16.png"
+            id="ch.gpb.elexis.cst.resultateffektiv"
+            name="Neue Auswertung Effektiv"
+            restorable="true">
+      </view>
+    <view
+            allowMultiple="false"
+            category="ch.gpb.elexis.cst"
+            class="ch.gpb.elexis.cst.widget.ResultatPartMinimax"
+            icon="icons/icon-cat-3-16.png"
+            id="ch.gpb.elexis.cst.resultatminimax"
+            name="Neue Auswertung Minimal / Maximal"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

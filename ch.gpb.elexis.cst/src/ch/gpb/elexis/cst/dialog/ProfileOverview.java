@@ -43,10 +43,10 @@ public class ProfileOverview extends StatusDialog {
     TableViewer tableViewer;
     private java.util.List<String[]> lProf = new ArrayList<String[]>();
 
+    // TODO: text localisations missing
     public ProfileOverview(Shell parent) {
 	super(parent);
 	setShellStyle(SWT.BORDER | SWT.RESIZE);
-	// TODO Auto-generated constructor stub
     }
 
     @Override

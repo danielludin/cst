@@ -726,6 +726,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		.getSharedImages()
 		.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 
+	// TODO: deleting a group should also clean up the profiles that have utilized this group!!
 	actionDeleteCstGroup = new Action() {
 	    public void run() {
 		TableItem[] selItem = tableCstGroup.getSelection();
@@ -1095,7 +1096,7 @@ public class CstThemenblockEditor extends ViewPart implements
 		    IStructuredSelection selection = (IStructuredSelection) tableViewerCstGroup.getSelection();
 		    Object o = ((IStructuredSelection) selection).getFirstElement();
 		    CstGroup profile = (CstGroup) o;
-		    showMessage("Error with Ranking. Reinitializing...");
+		    //showMessage("Error with Ranking. Reinitializing...");
 		    reinitRanking(profile);
 
 		}
