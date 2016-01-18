@@ -112,8 +112,8 @@ import ch.gpb.elexis.cst.view.profileeditor.ProImmunComposite;
 import ch.gpb.elexis.cst.view.profileeditor.RemindersComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TemplateComposite;
 import ch.gpb.elexis.cst.view.profileeditor.TherapieVorschlagComposite;
-import ch.gpb.elexis.cst.widget.ResultatPartEffektiv;
-import ch.gpb.elexis.cst.widget.ResultatPartMinimax;
+//import ch.gpb.elexis.cst.widget.ResultatPartEffektiv;
+//import ch.gpb.elexis.cst.widget.ResultatPartMinimax;
 
 /**
  * 
@@ -128,7 +128,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
     /**
      * The ID of the view as specified by the extension.
      */
-    public static final String ID = "ch.gpb.elexis.cst.views.CstProfileEditor";
+    public static final String ID = "ch.gpb.elexis.cst.views.cstprofileeditor";
 
     private CheckboxTableViewer tableViewerProfiles;
     private CheckboxTableViewer tableViewerCstGroups;
@@ -287,11 +287,7 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		switch (e.type) {
 		case SWT.Selection:
 
-		    if ((e.stateMask & SWT.CTRL) == SWT.CTRL) {
-			showResultPageNew();
-		    } else {
-			showResultPage();
-		    }
+		    showResultPage();
 
 		    break;
 		}
@@ -339,7 +335,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	ci12.setText(Messages.TemplateComposite_template_title);
 	TemplateComposite templateComposite = new TemplateComposite(ctabs);
 	ci12.setControl(templateComposite);
-
 
 	// Tabitem REminders
 	/*
@@ -636,69 +631,71 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 
     }
 
+    /*
     private void showResultPageNew() {
 
-	// TODO create Constants for the view IDs
+    // TODO create Constants for the view IDs
 
-	TableItem[] selItemC = tableProfile.getSelection();
+    TableItem[] selItemC = tableProfile.getSelection();
 
-	if (selItemC.length == 0) {
-	    showMessage(Messages.Cst_Text_Bitte_Profil_auswaehlen);
-	    return;
-	}
+    if (selItemC.length == 0) {
+        showMessage(Messages.Cst_Text_Bitte_Profil_auswaehlen);
+        return;
+    }
 
-	CstProfile selProfile = (CstProfile) selItemC[0].getData();
+    CstProfile selProfile = (CstProfile) selItemC[0].getData();
 
-	if (selProfile.getCstGroups().size() == 0) {
-	    MessageBox dialog =
-		    new MessageBox(UiDesk.getTopShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-	    dialog.setText(Messages.Cst_Text_profil_unvollstaendig);
-	    dialog.setMessage(Messages.Cst_Text_profil_hat_keine_gruppen);
+    if (selProfile.getCstGroups().size() == 0) {
+        MessageBox dialog =
+    	    new MessageBox(UiDesk.getTopShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+        dialog.setText(Messages.Cst_Text_profil_unvollstaendig);
+        dialog.setMessage(Messages.Cst_Text_profil_hat_keine_gruppen);
 
-	    // open dialog and await user selection
-	    int returnCode = dialog.open();
-	    if (returnCode == SWT.CANCEL) {
-		return;
-	    }
-
-	}
-
-	try {
-	    if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_EFFEKTIV)) {
-		ResultatPartEffektiv viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow()
-			.getActivePage().findView("ch.gpb.elexis.cst.resultateffektiv");
-		if (viewer == null) {
-		    viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-			    .getActivePage()
-			    .showView("ch.gpb.elexis.cst.resultateffektiv");
-		}
-		viewer.setProfile(selProfile);
-		viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-			.showView("ch.gpb.elexis.cst.resultateffektiv");
-
-	    }
-
-	    if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_MINIMAX)) {
-		ResultatPartMinimax viewer = (ResultatPartMinimax) PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow()
-			.getActivePage().findView("ch.gpb.elexis.cst.resultatminimax");
-		if (viewer == null) {
-		    viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-			    .getActivePage()
-			    .showView("ch.gpb.elexis.cst.resultatminimax");
-		}
-		viewer.setProfile(selProfile);
-		viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-			.showView("ch.gpb.elexis.cst.resultatminimax");
-
-	    }
-
-	} catch (PartInitException e) {
-	    log.info("Error opening result view: " + e.getMessage(), Log.INFOS);
-	}
+        // open dialog and await user selection
+        int returnCode = dialog.open();
+        if (returnCode == SWT.CANCEL) {
+    	return;
+        }
 
     }
+
+    try {
+        if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_EFFEKTIV)) {
+    	ResultatPartEffektiv viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench()
+    		.getActiveWorkbenchWindow()
+    		.getActivePage().findView("ch.gpb.elexis.cst.resultateffektiv");
+    	if (viewer == null) {
+    	    viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+    		    .getActivePage()
+    		    .showView("ch.gpb.elexis.cst.resultateffektiv");
+    	}
+    	viewer.setProfile(selProfile);
+    	viewer = (ResultatPartEffektiv) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+    		.showView("ch.gpb.elexis.cst.resultateffektiv");
+
+        }
+
+        if (selProfile.getAnzeigeTyp().equals(CstProfile.ANZEIGETYP_MINIMAX)) {
+    	ResultatPartMinimax viewer = (ResultatPartMinimax) PlatformUI.getWorkbench()
+    		.getActiveWorkbenchWindow()
+    		.getActivePage().findView("ch.gpb.elexis.cst.resultatminimax");
+    	if (viewer == null) {
+    	    viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+    		    .getActivePage()
+    		    .showView("ch.gpb.elexis.cst.resultatminimax");
+    	}
+    	viewer.setProfile(selProfile);
+    	viewer = (ResultatPartMinimax) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+    		.showView("ch.gpb.elexis.cst.resultatminimax");
+
+        }
+
+    } catch (PartInitException e) {
+        log.info("Error opening result view: " + e.getMessage(), Log.INFOS);
+    }
+
+    }*/
+
     private void showResultPage() {
 
 	// TODO create Constants for the view IDs
@@ -711,7 +708,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 	}
 
 	CstProfile selProfile = (CstProfile) selItemC[0].getData();
-
 
 	if (selProfile.getCstGroups().size() == 0) {
 	    MessageBox dialog =
@@ -1679,7 +1675,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
 		    reinitRanking(getSelectedProfile());
 		}
 
-
 		return String.valueOf(itemRanking.get(labItem.getId()));
 	    default:
 		return "?";
@@ -1745,7 +1740,6 @@ public class CstProfileEditor extends ViewPart implements IActivationListener {
     @Override
     public void activation(boolean mode) {
 	// TODO Auto-generated method stub
-
 
     }
 

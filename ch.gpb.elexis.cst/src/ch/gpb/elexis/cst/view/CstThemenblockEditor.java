@@ -115,7 +115,7 @@ public class CstThemenblockEditor extends ViewPart implements
     /**
      * The ID of the view as specified by the extension.
      */
-    public static final String ID = "ch.gpb.elexis.cst.views.CstCategoryView";
+    public static final String ID = "ch.gpb.elexis.cst.views.cstcategoryview";
 
     private CheckboxTableViewer tableViewerCstGroup;
     private CheckboxTableViewer tableViewerLabItem;
