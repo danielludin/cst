@@ -113,6 +113,10 @@ import com.lowagie.text.pdf.PdfWriter;
  * 595 / 842
  * 794 / 1123
  */
+// TODO: the output mechanism with SWT widgets may seem clumsy at first sight,
+// but an output via a generated and buffered image has the same limitations, that is, 
+// it simply stops being displayed at around 30'000 px heigth.
+// There seems to be some inner limitation that has to be investigated.
 
 public abstract class CstResultPart extends ViewPart implements IActivationListener {
     /**
