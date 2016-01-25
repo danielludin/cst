@@ -55,7 +55,9 @@ import ch.gpb.elexis.cst.data.CstProfile;
 import ch.gpb.elexis.cst.preferences.CstPreference;
 import ch.gpb.elexis.cst.preferences.Messages;
 import ch.rgw.tools.ExHandler;
-
+// TODO: the handling of the omnivore documents is done quick and dirty. There is an API to use these documents,
+// see i.e. in Labor View, and that should be used here for CST Documents
+//   
 public class CstDocumentsComposite extends CstComposite {
 
     CstProfile aProfile;
